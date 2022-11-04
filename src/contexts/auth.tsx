@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import { login, whoAmI, resetPassword } from "../utils/fetchApi";
+import { login, whoAmI, resetPassword } from "../service";
 import { notiError, notiSuccess } from "../utils/notification";
 
 export type User = {

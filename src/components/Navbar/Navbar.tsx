@@ -13,39 +13,46 @@ import {
     DoubleLeftOutlined,
 } from "@ant-design/icons";
 import styles from "./Navbar.module.scss";
+import { Tooltip } from "antd";
 const cx = classNames.bind(styles);
 function Navbar() {
     const navList = [
         {
             id: 1,
-            title: "Slider",
+            title: "Home",
+            desc: "Trang chủ",
             url: "/home",
             icon: <HomeFilled />,
             color: "#ee2b2b",
         },
         {
             id: 2,
-            title: "Category",
-            url: "/category",
+            title: "Category 1",
+            desc: "Trang chủ",
+            url: "/home1",
             icon: <CustomerServiceFilled />,
             color: "#8f11d3",
         },
         {
             id: 3,
-            title: "Danh sách Sản phẩm",
-            url: "/product",
+            title: "Category 2",
+            desc: "Trang chủ",
+            url: "/home2",
             icon: <GoldFilled />,
             color: "#11d37b",
         },
         {
             id: 4,
-            title: "Bài viết và Khuyễn mãi",
-            url: "/blog",
+            title: "Category 3",
+            desc: "Trang chủ",
+            url: "/home3",
             icon: <AlertFilled />,
             color: "#e0880a",
         },
     ];
-    const [checkPageLogin, setCheckPageLogin] = useState(false);
+    const [checkPageLogin, setCheckPageLogin] = useState<boolean>(false);
+    const [navActive, setNavActive] = useState<boolean>(false);
+
     const { pathname } = useRouter();
 
     useEffect(() => {
@@ -58,36 +65,33 @@ function Navbar() {
 
     return (
         <>
-            {checkPageLogin && (
-                <div className={cx("nav")}>
-                    <div className={cx("nav-container")}>
-                        <div className={cx("nav-active")}>
-                            <DoubleRightOutlined
-                                className={cx("nav-active_right")}
-                            />
-                            <DoubleLeftOutlined
-                                className={cx("nav-active_left")}
-                            />
-                        </div>
-                        <div className={cx("nav-logo")}>
-                            {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img
-                                className={cx("nav-logo_small")}
-                                src="/juwanfood-logo-short.png"
-                                alt="logo vfast"
-                            />
-                            {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img
-                                className={cx("nav-logo_full")}
-                                src="/juwanfood-logo.png"
-                                alt="logo vfast"
-                            />
-                        </div>
-                        <nav>
-                            <ul>
-                                {navList.map((item) => {
-                                    return (
-                                        <Link key={item.id} href={item.url}>
+            <div className={cx("nav", `${navActive ? "nav--active" : ""}`)}>
+                <div className={cx("nav-container")}>
+                    <div
+                        className={cx("nav-logo")}
+                        onClick={() => setNavActive((state) => !state)}
+                    >
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                            className={cx("nav-logo_small")}
+                            src="/juwanfood-logo-short.png"
+                            alt="logo vfast"
+                        />
+                    </div>
+                    <nav>
+                        <ul>
+                            {navList.map((item) => {
+                                return (
+                                    <Link key={item.id} href={item.url}>
+                                        <Tooltip
+                                            placement="right"
+                                            color="volcano"
+                                            title={item.desc}
+                                            mouseLeaveDelay={0}
+                                            overlayInnerStyle={{
+                                                borderRadius: "5px",
+                                            }}
+                                        >
                                             <li
                                                 className={cx(
                                                     `${
@@ -100,16 +104,20 @@ function Navbar() {
                                                 <div className={cx("nav-icon")}>
                                                     {item.icon}
                                                 </div>
-                                                <span>{item.title}</span>
+                                                <span
+                                                    className={cx("nav-title")}
+                                                >
+                                                    {item.title}
+                                                </span>
                                             </li>
-                                        </Link>
-                                    );
-                                })}
-                            </ul>
-                        </nav>
-                    </div>
+                                        </Tooltip>
+                                    </Link>
+                                );
+                            })}
+                        </ul>
+                    </nav>
                 </div>
-            )}
+            </div>
         </>
     );
 }
