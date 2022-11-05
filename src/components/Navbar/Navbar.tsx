@@ -3,56 +3,54 @@ import Link from "next/link";
 import classNames from "classnames/bind";
 import { useRouter } from "next/router";
 import {
-    HomeFilled,
-    CustomerServiceFilled,
-    GoldFilled,
-    ContactsFilled,
-    ReadFilled,
-    AlertFilled,
-    DoubleRightOutlined,
-    DoubleLeftOutlined,
-} from "@ant-design/icons";
+    BiBarChartSquare,
+    BiGridAlt,
+    BiHomeAlt,
+    BiIdCard,
+} from "react-icons/bi";
 import styles from "./Navbar.module.scss";
 import { Tooltip } from "antd";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import { setNav } from "../../store/slice/loginSlice";
 const cx = classNames.bind(styles);
+const navList = [
+    {
+        id: 1,
+        title: "Trang chủ",
+        desc: "Home",
+        url: "/home",
+        icon: <BiHomeAlt />,
+        color: "#ee2b2b",
+    },
+    {
+        id: 2,
+        title: "Album",
+        desc: "Album",
+        url: "/home1",
+        icon: <BiGridAlt />,
+        color: "#8f11d3",
+    },
+    {
+        id: 3,
+        title: "Bảng xếp hạng",
+        desc: "BXH",
+        url: "/home2",
+        icon: <BiBarChartSquare />,
+        color: "#11d37b",
+    },
+    {
+        id: 4,
+        title: "Nghệ sỹ",
+        desc: "Singer",
+        url: "/home3",
+        icon: <BiIdCard />,
+        color: "#e0880a",
+    },
+];
 function Navbar() {
-    const navList = [
-        {
-            id: 1,
-            title: "Home",
-            desc: "Trang chủ",
-            url: "/home",
-            icon: <HomeFilled />,
-            color: "#ee2b2b",
-        },
-        {
-            id: 2,
-            title: "Category 1",
-            desc: "Trang chủ",
-            url: "/home1",
-            icon: <CustomerServiceFilled />,
-            color: "#8f11d3",
-        },
-        {
-            id: 3,
-            title: "Category 2",
-            desc: "Trang chủ",
-            url: "/home2",
-            icon: <GoldFilled />,
-            color: "#11d37b",
-        },
-        {
-            id: 4,
-            title: "Category 3",
-            desc: "Trang chủ",
-            url: "/home3",
-            icon: <AlertFilled />,
-            color: "#e0880a",
-        },
-    ];
     const [checkPageLogin, setCheckPageLogin] = useState<boolean>(false);
-    const [navActive, setNavActive] = useState<boolean>(false);
-
+    const { navActive } = useAppSelector((state) => state.login);
+    const dispatch = useAppDispatch();
     const { pathname } = useRouter();
 
     useEffect(() => {
@@ -65,16 +63,30 @@ function Navbar() {
 
     return (
         <>
-            <div className={cx("nav", `${navActive ? "nav--active" : ""}`)}>
+            <div
+                className={`${
+                    navActive ? "fixed" : "hidden"
+                } laptop:hidden w-screen h-screen bg-[#00000075]  top-0 left-0 z-50 `}
+                style={{ backdropFilter: "blur(5px)" }}
+                onClick={() => dispatch(setNav(!navActive))}
+            ></div>
+            <div
+                className={`${cx(
+                    "nav",
+                    `${navActive ? "nav--active" : ""}`
+                )} fixed top-0 left-0 translate-x-[-100%] ${
+                    navActive ? "translate-x-[0]" : ""
+                } laptop:translate-x-[0] laptop:relative z-50`}
+            >
                 <div className={cx("nav-container")}>
                     <div
                         className={cx("nav-logo")}
-                        onClick={() => setNavActive((state) => !state)}
+                        onClick={() => dispatch(setNav(!navActive))}
                     >
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
                             className={cx("nav-logo_small")}
-                            src="/juwanfood-logo-short.png"
+                            src="/sgm-short.png"
                             alt="logo vfast"
                         />
                     </div>

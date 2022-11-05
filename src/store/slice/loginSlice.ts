@@ -10,12 +10,14 @@ export const test = createAsyncThunk("test", async (data: any, thunkAPI) => {
 });
 
 export interface LoginState {
+    navActive: boolean;
     isLogin: boolean;
     user: User;
     token: string;
 }
 
 const initialState: LoginState = {
+    navActive: false,
     isLogin: false,
     user: {
         id: "11111",
@@ -33,6 +35,9 @@ export const LoginSlice = createSlice({
             removeStoreLocal("token");
             state.isLogin = false;
             state.user = {} as User;
+        },
+        setNav: (state, action: PayloadAction<boolean>) => {
+            state.navActive = action.payload;
         },
     },
     extraReducers: {
@@ -52,5 +57,5 @@ export const LoginSlice = createSlice({
 });
 
 // Action creators are generated for each case reducer function
-export const { logOut } = LoginSlice.actions;
+export const { logOut, setNav } = LoginSlice.actions;
 export default LoginSlice.reducer;

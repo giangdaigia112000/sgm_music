@@ -1,14 +1,16 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
+@import "swiper/css";
+@import "swiper/css/navigation";
 html,
 body {
     padding: 0;
     margin: 0;
     font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
         Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
-    background-image: linear-gradient(62deg, #dbedffc7 0%, #efddffc3 100%);
+    background-color: #170f23;
+    color: #ffffff;
 }
 
 a {
@@ -19,6 +21,41 @@ a {
 * {
     box-sizing: border-box;
 }
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+/* Track */
+
+::-webkit-scrollbar-track {
+    background-color: #170f23;
+}
+
+/* Handle */
+
+::-webkit-scrollbar-thumb {
+    background-color: #c4c4c4;
+    border-radius: 10px;
+}
+
+/* Handle on hover */
+
+::-webkit-scrollbar-thumb:hover {
+    background-color: rgb(121, 121, 121);
+}
+
+.scrollbox {
+    width: 10em;
+    height: 10em;
+    overflow: auto;
+    visibility: hidden;
+}
+
+.scrollbox-content,
+.scrollbox:hover,
+.scrollbox:focus {
+    visibility: visible;
+}
 
 .container-page {
     display: flex;
@@ -28,6 +65,7 @@ a {
     flex: 1;
     overflow: hidden;
     height: 100vh;
+    position: relative;
 }
 .body-content {
     width: 100%;
@@ -35,6 +73,99 @@ a {
     overflow-y: auto;
     overflow-x: hidden;
 }
+.play-audio {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: calc(100% - 6px);
+    background-color: #130c1c;
+    border-top: 1px solid #ffffff1a;
+    display: flex;
+    align-items: center;
+    box-shadow: #d1d1d133 0px 2px 8px 0px;
+}
+/* custom ant popover */
+.ant-popover-arrow-content {
+    --antd-arrow-background-color: #34224f !important;
+}
+.ant-popover-inner {
+    background-color: #34224f !important;
+    border-radius: 10px;
+}
+/* custom ant popover */
+
+.hiddentext {
+    display: block;
+    display: -webkit-box;
+    height: 1.25rem * 2;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    -webkit-line-clamp: 2; /* số dòng hiển thị */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.hiddentext1 {
+    display: block;
+    display: -webkit-box;
+    height: 1.25rem * 1;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    -webkit-line-clamp: 1; /* số dòng hiển thị */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+/* custom react h5 audio play  */
+.rhap_container {
+    background-color: transparent;
+    height: 100%;
+}
+.rhap_container * {
+    color: #ffffffef;
+}
+.rhap_time {
+    font-size: 0.8rem;
+}
+.rhap_progress-bar {
+    height: 3px;
+}
+.rhap_controls-section {
+    justify-content: center;
+    margin-top: 0px !important;
+}
+.rhap_additional-controls {
+    flex: unset;
+}
+.rhap_volume-controls {
+    flex: unset;
+}
+.rhap_progress-indicator {
+    width: 15px;
+    height: 15px;
+    top: -6px;
+}
+.rhap_controls-section * {
+    font-size: 1.8rem;
+}
+.rhap_play-pause-button svg {
+    font-size: 2rem;
+}
+.rhap_repeat-button > svg {
+    font-size: 1.2rem;
+}
+.rhap_volume-container svg {
+    font-size: 1.2rem;
+}
+.rhap_volume-bar {
+    height: 2px;
+    min-width: 40px;
+}
+.rhap_volume-indicator {
+    top: -5px;
+}
+/* custom react h5 audio play  */
 .ql-editor {
     height: 500px !important;
     overflow: hidden;

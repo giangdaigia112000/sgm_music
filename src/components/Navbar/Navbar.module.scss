@@ -1,11 +1,12 @@
 .nav {
     width: 70px;
     height: 100vh;
-    background-color: rgb(255, 255, 255);
+    background-color: #2a213a;
     box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
     transition: width 0.3s;
     position: block;
     overflow: hidden;
+    transition: 0.3s;
     .nav-container {
         padding: 5px;
         height: 100%;
@@ -36,7 +37,8 @@
                 width: 185.86px;
                 height: 100%;
                 border-radius: 10px;
-                content: url("/juwanfood-logo.png");
+                content: url("/sgm.png");
+                filter: drop-shadow(0 0 0.45rem #ffe2e860);
             }
             .nav-logo_full {
                 padding: 1px;
@@ -55,10 +57,10 @@
                     width: 100%;
                     overflow: hidden;
                     display: flex;
-                    border-radius: 10px;
                     cursor: pointer;
                     margin-top: 5px;
-                    transition: 0.3s;
+                    transition: width 0.3s;
+                    color: #ffffffb6;
                     .nav-icon {
                         height: 100%;
                         width: 50px;
@@ -77,25 +79,22 @@
                         font-weight: 600;
                         overflow: hidden;
                         opacity: 0;
-                        transition: 0.3s;
                     }
                     &:hover {
-                        background-color: #d4fdfd;
+                        color: #ffffff;
                     }
                 }
                 .active {
-                    color: #fff;
                     background-color: #2c3e48;
-                    &:hover {
-                        background-color: #2c3e48;
-                    }
+                    border-left: 5px solid #9b4de0;
+                    background-color: #393243;
                 }
             }
         }
     }
 }
 .nav--active {
-    width: 250px;
+    width: 220px;
     .nav-container {
         .nav-active {
             .nav-active_right {

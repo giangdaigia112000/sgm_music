@@ -1,96 +1,149 @@
 .header {
-  width: 100%;
-  height: 70px;
-  background-color: aliceblue;
-  background-image: url('/bg-header.png');
-  background-size: cover;
-  background-position: top;
-  background-repeat: repeat-y;
-
-  display: flex;
-  flex-direction: row-reverse;
-  align-items: center;
-  .header-profile {
-    height: 100%;
-    position: relative;
-    .header-profile_show {
-      height: 100%;
-      display: flex;
-      align-items: center;
-      margin-right: 50px;
-      cursor: pointer;
-      > h2 {
-        color: #fff;
-        font-size: 16px;
-        text-transform: uppercase;
-        margin: 0;
-      }
-      .header-profile_icon {
-        margin-left: 8px;
-        color: #fff;
-        font-size: 20px;
-      }
-    }
-    .header-profile_hover {
-      position: absolute;
-      top: 100%;
-      visibility: hidden;
-      right: 50px;
-      width: 300px;
-      height: 100px;
-      box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
-      border-radius: 10px;
-      opacity: 0;
-      transform: translateY(20%);
-      background-color: #fff;
-      transition: all 0.2s linear;
-      z-index: 100;
-      .header-profile_control {
-        width: 100%;
-        height: 50px;
-        padding: 10px;
-        border-bottom: 2px solid rgba(239, 66, 3, 0.462);
+    width: 100%;
+    height: 70px;
+    background-color: transparent;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    .header-search {
         display: flex;
-        justify-content: space-around;
-        > span {
-          font-size: 16px;
-          cursor: pointer;
+        height: 100%;
+        align-items: center;
+
+        .search {
+            position: relative;
+            > span {
+                > span {
+                    border-radius: 8px;
+                    overflow: hidden;
+                    background-color: transparent !important;
+                    > span {
+                        left: 0 !important;
+                        background-color: transparent !important;
+                    }
+                }
+            }
+            .search-result {
+                position: absolute;
+                left: 0;
+                bottom: 0;
+                transform: translateY(100%);
+                width: 100%;
+                background-color: #2f2739;
+                display: none;
+                padding: 10px;
+            }
+            &--active {
+                z-index: 10000;
+                > span {
+                    > span {
+                        border-bottom-left-radius: 0px;
+                        border-bottom-right-radius: 0px;
+                    }
+                }
+                .search-result {
+                    display: block;
+                }
+            }
         }
-        .active {
-          font-weight: 700;
-          color: rgb(241, 83, 4);
+
+        * {
+            color: #ffffff !important;
+            border: none;
         }
-      }
-      .header-profile_main {
-        width: 100%;
-        height: calc(100% - 50px);
-        overflow: hidden;
-        .header-profile_logout {
-          width: 100%;
-          height: 100%;
-          display: flex;
-          justify-content: center;
-          align-items: center;
+        input {
+            background-color: #2f2739 !important;
+            height: 40px !important;
+            &:focus {
+                box-shadow: none !important;
+            }
         }
-        .header-profile_changepass {
-          width: 100%;
-          height: 100%;
-          display: flex;
-          justify-content: center;
-          align-items: center;
+        button {
+            background-color: #2f2739 !important;
+            height: 40px !important;
         }
-      }
     }
-    .is-change-pass {
-      width: 400px;
-      height: 250px;
+    .header-profile {
+        height: 100%;
+        position: relative;
+        .header-profile_show {
+            height: 100%;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            > h2 {
+                color: #fff;
+                font-size: 16px;
+                text-transform: uppercase;
+                margin: 0;
+            }
+            .header-profile_icon {
+                margin-left: 8px;
+                color: #fff;
+                font-size: 20px;
+            }
+        }
+        .header-profile_hover {
+            position: absolute;
+            top: 100%;
+            visibility: hidden;
+            right: 50px;
+            width: 300px;
+            height: 100px;
+            box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+            border-radius: 10px;
+            opacity: 0;
+            transform: translateY(20%);
+            background-color: #2f2739;
+            color: #ffffff;
+            transition: all 0.2s linear;
+            z-index: 100;
+            .header-profile_control {
+                width: 100%;
+                height: 50px;
+                padding: 10px;
+                border-bottom: 2px solid rgba(239, 66, 3, 0.462);
+                display: flex;
+                justify-content: space-around;
+                > span {
+                    font-size: 16px;
+                    cursor: pointer;
+                }
+                .active {
+                    font-weight: 700;
+                    color: rgb(241, 83, 4);
+                }
+            }
+            .header-profile_main {
+                width: 100%;
+                height: calc(100% - 50px);
+                overflow: hidden;
+                .header-profile_logout {
+                    width: 100%;
+                    height: 100%;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                }
+                .header-profile_changepass {
+                    width: 100%;
+                    height: 100%;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                }
+            }
+        }
+        .is-change-pass {
+            width: 400px;
+            height: 250px;
+        }
+        &:hover {
+            .header-profile_hover {
+                visibility: visible;
+                transform: translateY(-1%);
+                opacity: 1;
+            }
+        }
     }
-    &:hover {
-      .header-profile_hover {
-        visibility: visible;
-        transform: translateY(-1%);
-        opacity: 1;
-      }
-    }
-  }
 }
