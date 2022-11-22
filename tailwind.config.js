@@ -30,7 +30,14 @@ module.exports = {
             animation: {
                 "spin-slow": "xoay 10s linear infinite",
             },
+            fontSize: {
+                nho: "0.5rem",
+                to: "2.5rem",
+            },
         },
     },
     plugins: [],
+    corePlugins: {
+        preflight: false, // <== disable this!
+    },
 };

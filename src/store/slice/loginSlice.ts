@@ -1,29 +1,49 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { User } from "../../interface";
-import { getStoreLocal, removeStoreLocal } from "../../utils/localStore";
+import axiosClient from "../../service/axiosClient";
+import {
+    getStoreLocal,
+    removeStoreLocal,
+    setStoreLocal,
+} from "../../utils/localStore";
+import { notiError, notiSuccess } from "../../utils/notification";
 
-export const test = createAsyncThunk("test", async (data: any, thunkAPI) => {
-    try {
-    } catch (error) {
-        return thunkAPI.rejectWithValue({ error: error });
+export const userRegister = createAsyncThunk(
+    "userRegister",
+    async (data: any, thunkAPI) => {
+        const res = await axiosClient.post("/api/auth/register", data);
+        return res.data;
     }
+);
+
+export const userLogin = createAsyncThunk(
+    "userLogin",
+    async (data: any, thunkAPI) => {
+        const res = await axiosClient.post("/api/auth/login", data);
+        return res.data;
+    }
+);
+
+export const userCheckMe = createAsyncThunk("userCheckMe", async () => {
+    const res = await axiosClient.post("/api/auth/info", {
+        _method: "get",
+    });
+    return res.data;
 });
 
 export interface LoginState {
+    loading: boolean;
     navActive: boolean;
     isLogin: boolean;
-    user: User;
+    user: User | null;
     token: string;
 }
 
 const initialState: LoginState = {
-    navActive: false,
+    loading: false,
+    navActive: true,
     isLogin: false,
-    user: {
-        id: "11111",
-        email: "giang@gmail.com",
-        name: "giang",
-    } as User,
+    user: null,
     token: getStoreLocal("token") ? "" : (getStoreLocal("token") as string),
 };
 
@@ -34,25 +54,73 @@ export const LoginSlice = createSlice({
         logOut: (state) => {
             removeStoreLocal("token");
             state.isLogin = false;
-            state.user = {} as User;
+            state.user = null;
         },
         setNav: (state, action: PayloadAction<boolean>) => {
             state.navActive = action.payload;
         },
     },
     extraReducers: {
-        // [test.pending.toString()]: (state) => {
-        //     state.loadingLogin = true;
-        // },
-        // [test.fulfilled.toString()]: (
-        //     state,
-        //     action: PayloadAction<any>
-        // ) => {},
-        // [test.rejected.toString()]: (
-        //     state,
-        //     action: PayloadAction<any>
-        // ) => {},
-        // //////////////////////////////////////////////////////////////////
+        [userRegister.pending.toString()]: (state) => {
+            state.loading = true;
+        },
+        [userRegister.fulfilled.toString()]: (
+            state,
+            action: PayloadAction<any>
+        ) => {
+            state.loading = false;
+            notiSuccess("Đăng ký thành công.");
+        },
+        [userRegister.rejected.toString()]: (
+            state,
+            action: PayloadAction<any>
+        ) => {
+            state.loading = false;
+            notiError("Đăng ký thất bại.");
+        },
+        //////////////////////////////////////////////////////////////////
+        [userLogin.pending.toString()]: (state) => {
+            state.loading = true;
+        },
+        [userLogin.fulfilled.toString()]: (
+            state,
+            action: PayloadAction<any>
+        ) => {
+            state.loading = false;
+            console.log(action.payload);
+
+            const token = action.payload.data.token as string;
+            setStoreLocal("token", token);
+            state.token = token;
+            state.isLogin = true;
+            state.user = action.payload.data.user as User;
+            notiSuccess("Đăng nhập thành công.");
+        },
+        [userLogin.rejected.toString()]: (
+            state,
+            action: PayloadAction<any>
+        ) => {
+            state.loading = false;
+            notiError("Đăng nhập thất bại.");
+        },
+        //////////////////////////////////////////////////////////////////
+        [userCheckMe.pending.toString()]: (state) => {
+            state.loading = true;
+        },
+        [userCheckMe.fulfilled.toString()]: (
+            state,
+            action: PayloadAction<any>
+        ) => {
+            state.loading = false;
+            state.isLogin = true;
+            state.user = action.payload as User;
+        },
+        [userCheckMe.rejected.toString()]: (
+            state,
+            action: PayloadAction<any>
+        ) => {
+            state.loading = false;
+        },
     },
 });
 

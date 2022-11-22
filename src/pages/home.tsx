@@ -1,6 +1,22 @@
 import { useEffect, useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, Pagination } from "swiper";
+import ListCategory from "../components/ListCategory";
+import ListAlbum from "../components/ListAlbum";
+import { BiChevronRight } from "react-icons/bi";
+import { useRouter } from "next/router";
+import ListSong from "../components/ListSong";
+import { useAppDispatch, useAppSelector } from "../store/hooks";
+import {
+    getListAlbumHome,
+    getListSongHome,
+    getListSongSlide,
+} from "../store/slice/homeSlice";
+import { setSongList } from "../store/slice/playSlice";
+import { Skeleton } from "antd";
+import { Album, Category, Song } from "../interface";
+import { getAllSinger } from "../store/slice/singerSlice";
+import { getCategoryHome } from "../store/slice/categorySlice";
 const slide = [
     {
         img: "https://photo-zmp3.zmdcdn.me/banner/5/5/8/a/558aa70110ea057e49322f8c052077db.jpg",
@@ -12,7 +28,32 @@ const slide = [
         img: "https://photo-zmp3.zmdcdn.me/banner/d/b/8/a/db8ab51fc34f82b584a4e7ca82651b5a.jpg",
     },
 ];
+const skeleton = [1, 2, 3, 4, 5];
 const Home = () => {
+    const { push } = useRouter();
+    const { listSongSlide, listSongHome, listAlbumHome } = useAppSelector(
+        (state) => state.home
+    );
+    const albumShowHome = listAlbumHome
+        ? (listAlbumHome.map((album, index) => {
+              if (index < 13) return album;
+          }) as Album[])
+        : [];
+    const songShowHome = listSongHome
+        ? (listSongHome.map((song, index) => {
+              if (index < 31) return song;
+          }) as Song[])
+        : [];
+    const { categoryHome } = useAppSelector((state) => state.category);
+    const dispatch = useAppDispatch();
+
+    useEffect(() => {
+        dispatch(getListSongSlide());
+        dispatch(getListSongHome());
+        dispatch(getListAlbumHome());
+        dispatch(getAllSinger());
+        dispatch(getCategoryHome());
+    }, []);
     return (
         <div className="w-full">
             <div className="w-full relative">
@@ -35,19 +76,19 @@ const Home = () => {
                     slidesPerView={3.5}
                     breakpoints={{
                         "@0.00": {
-                            slidesPerView: 1.5,
+                            slidesPerView: 2,
                             spaceBetween: 10,
                         },
                         "@0.75": {
-                            slidesPerView: 2.5,
+                            slidesPerView: 3,
                             spaceBetween: 20,
                         },
                         "@1.00": {
-                            slidesPerView: 3,
+                            slidesPerView: 4,
                             spaceBetween: 30,
                         },
                         "@1.50": {
-                            slidesPerView: 3.5,
+                            slidesPerView: 5,
                             spaceBetween: 40,
                         },
                     }}
@@ -57,32 +98,81 @@ const Home = () => {
                     pagination={{
                         clickable: true,
                     }}
-                    loopedSlides={slide.length}
+                    loopedSlides={5}
                     autoplay={{
                         delay: 3500,
                         disableOnInteraction: false,
                     }}
                     modules={[Autoplay, Pagination]}
                 >
-                    {slide.map((sl, idx) => (
-                        <SwiperSlide key={idx}>
-                            {/*  eslint-disable-next-line @next/next/no-img-element */}
-                            <img
-                                className="rounded-xl cursor-pointer"
-                                style={{
-                                    boxShadow: "#d1d1d133 0px 2px 8px 0px",
-                                }}
-                                src={sl.img}
-                                alt="slider"
-                            />
-                        </SwiperSlide>
-                    ))}
+                    {listSongSlide.length === 0 ? (
+                        <>
+                            {skeleton.map((_, idx) => (
+                                <SwiperSlide key={idx}>
+                                    <div className="w-full pt-[100%] relative">
+                                        <Skeleton.Image
+                                            className="rounded-xl absolute top-0 left-0 w-full h-full object-cover"
+                                            active={true}
+                                        />
+                                    </div>
+                                </SwiperSlide>
+                            ))}
+                        </>
+                    ) : (
+                        <>
+                            {listSongSlide.map((song) => (
+                                <SwiperSlide key={song.id}>
+                                    <div
+                                        onClick={() =>
+                                            dispatch(setSongList([song]))
+                                        }
+                                        className="w-full pt-[100%] relative"
+                                    >
+                                        {/*  eslint-disable-next-line @next/next/no-img-element */}
+                                        <img
+                                            className="rounded-xl cursor-pointer absolute top-0 left-0 w-full h-full object-cover"
+                                            style={{
+                                                boxShadow:
+                                                    "#d1d1d133 0px 2px 8px 0px",
+                                            }}
+                                            src={`${process.env.HOST_NAME_STREAM}/image/${song.thumbnail}`}
+                                            alt="slider"
+                                        />
+                                    </div>
+                                </SwiperSlide>
+                            ))}
+                        </>
+                    )}
                 </Swiper>
             </div>
-            <div className="w-full  pt-[20px] tablet:pt-[40px] text-lg tablet:text-xl font-bold">
-                <h1 className="text-[#fff]">Thể Loại</h1>
+            <div className="w-full  pt-[20px] tablet:pt-[40px]">
+                <h1 className="text-[#fff]  text-lg tablet:text-xl font-bold">
+                    Thể Loại
+                </h1>
+                <ListCategory listcate={categoryHome} />
             </div>
-            <div className="h-[2200px]"></div>
+            <div className="w-full  pt-[20px] tablet:pt-[40px] relative">
+                <div
+                    onClick={() => {
+                        push("/album");
+                    }}
+                    className="flex items-center text-sm tablet:text-base text-[#ffffff94] hover:text-[#891dee] cursor-pointer absolute right-0 top-[20px] tablet:top-[40px]"
+                >
+                    TẤT CẢ
+                    <BiChevronRight className="w-[25px] h-[25px] tablet:w-[30px] tablet:h-[30px] " />
+                </div>
+                <h1 className="text-[#fff] text-lg tablet:text-xl font-bold">
+                    Album Mới & Hot
+                </h1>
+                <ListAlbum listAlbum={albumShowHome} />
+            </div>
+            <div className="w-full  pt-[20px] tablet:pt-[40px] relative">
+                <h1 className="text-[#fff] text-lg tablet:text-xl font-bold">
+                    Gợi ý cho bạn
+                </h1>
+                <ListSong listSong={songShowHome} />
+            </div>
+            <div className="h-[200px]"></div>
         </div>
     );
 };

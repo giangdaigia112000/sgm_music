@@ -13,24 +13,66 @@ import {
     BiStar,
 } from "react-icons/bi";
 import { Popover, Rate, Tooltip } from "antd";
+import { useRouter } from "next/router";
+import { notiError, notiWarning } from "../../utils/notification";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import { getPlaySong, setSongActive } from "../../store/slice/playSlice";
+import { updatePlaylist } from "../../store/slice/playlistSlice";
+import { setSingerId } from "../../store/slice/singerSlice";
 
 const PlayAudio = () => {
+    const { listSongPlay, songActive } = useAppSelector((state) => state.play);
+    const { allPlaylist } = useAppSelector((state) => state.playlist);
+
+    const dispatch = useAppDispatch();
+
     const audioRef = useRef<any>();
+    const PlayAudio = useRef<any>();
+
+    const { push } = useRouter();
+
     const [value, setValue] = useState<number>(3);
     const [isPlay, setIsPlay] = useState<boolean>(false);
 
+    const handleClickPrevious = () => {
+        dispatch(
+            setSongActive(
+                songActive === 0 ? listSongPlay.length - 1 : songActive - 1
+            )
+        );
+    };
+
+    const handleClickNext = () => {
+        dispatch(
+            setSongActive(
+                songActive < listSongPlay.length - 1 ? songActive + 1 : 0
+            )
+        );
+    };
+
     useEffect(() => {
+        if (listSongPlay.length === 0) return;
+        dispatch(getPlaySong(listSongPlay[songActive].id));
+    }, [listSongPlay, songActive]);
+
+    useEffect(() => {
+        if (listSongPlay.length === 0) return;
+        if (listSongPlay.length === 1) dispatch(setSongActive(0));
         if (Hls.isSupported()) {
+            if (!audioRef.current) return;
             const hls = new Hls();
+            const name = listSongPlay[songActive].file_path;
             hls.loadSource(
-                "https://bitdash-a.akamaihd.net/content/sintel/hls/playlist.m3u8"
+                `${process.env.HOST_NAME_STREAM}/${name}/${name}.m3u8`
             );
             hls.attachMedia(audioRef.current.audio.current);
+            audioRef.current.audio.current.play();
+
             return () => {
                 hls.destroy();
             };
         }
-    }, []);
+    }, [listSongPlay, songActive]);
 
     const PlayList = () => {
         return (
@@ -38,24 +80,32 @@ const PlayAudio = () => {
                 <span className="text-xs laptop:text-sm font-semibold  block mb-[5px] w-full text-center">
                     Danh sách Playlist
                 </span>
-                <div className="w-full pl-[2px] text-xs laptop:text-sm h-[40px] flex gap-[5px] items-center text-[#fff]  cursor-pointer hover:bg-[#493961]">
-                    <BiMusic className="w-[20px] h-[20px] laptop:w-[28px] laptop:h-[28px] p-[3px]" />
-                    <span className="flex items-center flex-1 justify-between">
-                        Nhạc hay nghe lúc tắm
-                    </span>
-                </div>
-                <div className="w-full pl-[2px] text-xs laptop:text-sm h-[40px] flex gap-[5px] items-center text-[#fff]  cursor-pointer hover:bg-[#493961]">
-                    <BiMusic className="w-[20px] h-[20px] laptop:w-[28px] laptop:h-[28px] p-[3px]" />
-                    <span className="flex items-center flex-1 justify-between">
-                        Nhạc hay nghe lúc tắm
-                    </span>
-                </div>
-                <div className="w-full pl-[2px] text-xs laptop:text-sm h-[40px] flex gap-[5px] items-center text-[#fff]  cursor-pointer hover:bg-[#493961]">
-                    <BiMusic className="w-[20px] h-[20px] laptop:w-[28px] laptop:h-[28px] p-[3px]" />
-                    <span className="flex items-center flex-1 justify-between">
-                        Nhạc hay nghe lúc tắm
-                    </span>
-                </div>
+                {allPlaylist.length > 0 &&
+                    allPlaylist.map((pl) => (
+                        <div
+                            key={pl.id}
+                            onClick={() => {
+                                if (
+                                    pl.music.includes(listSongPlay[songActive])
+                                ) {
+                                    notiWarning("Bài hát đã có trong playlist");
+                                    return;
+                                }
+                                dispatch(
+                                    updatePlaylist({
+                                        ...pl,
+                                        idSong: listSongPlay[songActive].id,
+                                    })
+                                );
+                            }}
+                            className="w-full pl-[2px] text-xs laptop:text-sm h-[40px] flex gap-[5px] items-center text-[#fff]  cursor-pointer hover:bg-[#493961]"
+                        >
+                            <BiMusic className="w-[20px] h-[20px] laptop:w-[28px] laptop:h-[28px] p-[3px]" />
+                            <span className="flex items-center flex-1 justify-between">
+                                {pl.name}
+                            </span>
+                        </div>
+                    ))}
             </div>
         );
     };
@@ -96,7 +146,7 @@ const PlayAudio = () => {
                         </span>
                     </div>
                 </Popover>
-                <Popover
+                {/* <Popover
                     placement="right"
                     trigger="click"
                     _overlay={<RateStar />}
@@ -108,128 +158,160 @@ const PlayAudio = () => {
                             <BiChevronRight className="w-[20px] h-[20px] laptop:w-[28px] laptop:h-[28px] p-[3px]" />
                         </span>
                     </div>
-                </Popover>
+                </Popover> */}
             </div>
         );
     };
-    return (
-        <div className="play-audio flex flex-col laptop:flex-row laptop:px-[15px]">
-            <div className=" h-full w-full laptop:w-fit laptop:w-[1/2]  flex  items-center px-[15px] pt-[10px] laptop:py-[10px] relative">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                    className={` w-[35px] h-[35px] rounded-full laptop:h-[60px] laptop:w-[60px] object-cover ${
-                        isPlay
-                            ? "animate-spin-slow rounded-full"
-                            : "laptop:rounded-lg"
-                    }  `}
-                    style={{
-                        transition: "0.5s",
-                    }}
-                    src="https://photo-resize-zmp3.zmdcdn.me/w240_r1x1_webp/cover/b/6/d/e/b6deae9187fdee862e95ed77ed752f4f.jpg"
-                    alt="thumb"
-                />
-                <div className="h-full  flex justify-center flex-col mx-[15px]">
-                    <Tooltip
-                        placement="top"
-                        color="volcano"
-                        title={"Tình sầu thiên thu muôn lối"}
-                        mouseLeaveDelay={0}
-                        overlayInnerStyle={{
-                            borderRadius: "5px",
-                        }}
-                    >
-                        <span className="hiddentext1 font-semibold pb-[5px] text-xs tablet:text-sm  text-[#ffffffb2] hiddentext">
-                            Tình sầu thiên thu muôn lối.
-                        </span>
-                    </Tooltip>
-                    <span className="text-[#ffffffe7] text-xs tablet:text-sm cursor-pointer hover:text-[#0e12d8]">
-                        OSAD
-                    </span>
-                </div>
 
-                <div className="h-full  flex items-center px-[10px] tablet:hidden absolute top-0 right-0">
-                    <Popover
-                        placement="topRight"
-                        trigger="click"
-                        _overlay={<PopoverPlayer />}
-                    >
-                        <BiDotsHorizontalRounded className="text-base bg-[#62616b] w-[28px] h-[28px] rounded-full p-[4px] cursor-pointer" />
-                    </Popover>
+    return (
+        <>
+            {listSongPlay.length !== 0 && (
+                <div
+                    ref={PlayAudio}
+                    className="play-audio flex flex-col tablet:flex-row tablet:px-[15px] z-10 tra translate-y-[50px] hover:translate-y-0 tablet:translate-y-0 transition-all"
+                >
+                    <div className="h-full w-full tablet:w-fit laptop:w-[1/2]  flex  items-center px-[15px] pt-[10px] tablet:py-[10px] relative">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                            onClick={(e) => {
+                                push("/play");
+                            }}
+                            className={` w-[35px] h-[35px] rounded-full tablet:h-[60px] tablet:w-[60px] object-cover cursor-pointer ${
+                                isPlay
+                                    ? "animate-spin-slow rounded-full"
+                                    : "laptop:rounded-lg"
+                            }  `}
+                            style={{
+                                transition: " 0.5s all ease-in",
+                            }}
+                            src={`${process.env.HOST_NAME_STREAM}/image/${listSongPlay[songActive].thumbnail}`}
+                            alt="thumb"
+                        />
+                        <div className="h-full  flex justify-center flex-col mx-[15px]">
+                            <Tooltip
+                                placement="top"
+                                color="volcano"
+                                title={"Tình sầu thiên thu muôn lối"}
+                                mouseLeaveDelay={0}
+                                overlayInnerStyle={{
+                                    borderRadius: "5px",
+                                }}
+                            >
+                                <span className="hiddentext1 font-semibold pb-[5px] text-xs tablet:text-sm  text-[#ffffffe7] hiddentext">
+                                    {listSongPlay[songActive].title}
+                                </span>
+                            </Tooltip>
+                            {listSongPlay[songActive].singer.length > 0 &&
+                                listSongPlay[songActive].singer.map(
+                                    (singer) => (
+                                        <span
+                                            key={singer.id}
+                                            onClick={() => {
+                                                dispatch(
+                                                    setSingerId(singer.id)
+                                                );
+                                                push(
+                                                    `/singerdetail/${singer.id}`
+                                                );
+                                            }}
+                                            className="text-[#ffffff80] text-xs tablet:text-sm cursor-pointer hover:text-[#0e12d8] W-fit"
+                                        >
+                                            {singer.name}
+                                        </span>
+                                    )
+                                )}
+                        </div>
+
+                        <div className="h-full  flex items-center px-[10px] tablet:hidden absolute top-0 right-0">
+                            <Popover
+                                placement="topRight"
+                                trigger="click"
+                                _overlay={<PopoverPlayer />}
+                            >
+                                <BiDotsHorizontalRounded className="text-base bg-[#62616b] w-[28px] h-[28px] rounded-full p-[4px] cursor-pointer" />
+                            </Popover>
+                        </div>
+                        <div className="h-full flex-1  justify-end items-center gap-[5px] hidden tablet:flex laptop:hidden">
+                            <BiDownload className="w-[25px] h-[25px] laptop:w-[28px] laptop:h-[28px] p-[3px] text-[#ffffff80] hover:text-[#ffffff] cursor-pointer" />
+                            <BiFlag className="w-[25px] h-[25px] laptop:w-[28px] laptop:h-[28px] p-[3px]  text-[#ffffff80] hover:text-[#ffffff] cursor-pointer" />
+                            <Popover
+                                placement="topRight"
+                                trigger="click"
+                                _overlay={<PlayList />}
+                            >
+                                <BiPlusCircle className="w-[25px] h-[25px] laptop:w-[28px] laptop:h-[28px] p-[3px]  text-[#ffffff80] hover:text-[#ffffff] cursor-pointer" />
+                            </Popover>
+                            {/* <Popover
+                                placement="topRight"
+                                trigger="click"
+                                _overlay={<RateStar />}
+                            >
+                                <BiStar className="w-[25px] h-[25px] laptop:w-[28px] laptop:h-[28px] p-[3px]  text-[#ffffff80] hover:text-[#ffffff] cursor-pointer" />
+                            </Popover> */}
+                        </div>
+                    </div>
+                    <div className="h-full flex-1 w-full">
+                        <AudioPlayer
+                            ref={audioRef}
+                            src={""}
+                            showSkipControls={true}
+                            showJumpControls={false}
+                            onClickPrevious={handleClickPrevious}
+                            onClickNext={handleClickNext}
+                            customIcons={{
+                                play: (
+                                    <BiPlayCircle className="text-[#ffffff80]" />
+                                ),
+                                pause: (
+                                    <BiPauseCircle className="text-[#ffffff80]" />
+                                ),
+                            }}
+                            onPlay={() => setIsPlay(true)}
+                            onPause={() => setIsPlay(false)}
+                            // onPlayError={() => notiError("Trình phát lỗi.")}
+                        />
+                    </div>
+                    <div className="h-full  justify-end items-center gap-[10px] hidden laptop:flex pl-[30px]">
+                        <Tooltip
+                            placement="top"
+                            color="volcano"
+                            title={"Tải xuống"}
+                            mouseLeaveDelay={0}
+                            overlayInnerStyle={{
+                                borderRadius: "5px",
+                            }}
+                        >
+                            <BiDownload className="w-[25px] h-[25px] laptop:w-[28px] laptop:h-[28px] p-[3px] text-[#ffffff80] hover:text-[#ffffff] cursor-pointer" />
+                        </Tooltip>
+                        <Tooltip
+                            placement="top"
+                            color="volcano"
+                            title={"Báo cáo"}
+                            mouseLeaveDelay={0}
+                            overlayInnerStyle={{
+                                borderRadius: "5px",
+                            }}
+                        >
+                            <BiFlag className="w-[25px] h-[25px] laptop:w-[28px] laptop:h-[28px] p-[3px]  text-[#ffffff80] hover:text-[#ffffff] cursor-pointer" />
+                        </Tooltip>
+                        <Popover
+                            placement="topRight"
+                            trigger="click"
+                            _overlay={<PlayList />}
+                        >
+                            <BiPlusCircle className="w-[25px] h-[25px] laptop:w-[28px] laptop:h-[28px] p-[3px]  text-[#ffffff80] hover:text-[#ffffff] cursor-pointer" />
+                        </Popover>
+                        {/* <Popover
+                            placement="topRight"
+                            trigger="click"
+                            _overlay={<RateStar />}
+                        >
+                            <BiStar className="w-[25px] h-[25px] laptop:w-[28px] laptop:h-[28px] p-[3px]  text-[#ffffff80] hover:text-[#ffffff] cursor-pointer" />
+                        </Popover> */}
+                    </div>
                 </div>
-                <div className="h-full flex-1  justify-end items-center gap-[5px] hidden tablet:flex laptop:hidden">
-                    <BiDownload className="w-[25px] h-[25px] laptop:w-[28px] laptop:h-[28px] p-[3px] text-[#ffffff91] hover:text-[#ffffff] cursor-pointer" />
-                    <BiFlag className="w-[25px] h-[25px] laptop:w-[28px] laptop:h-[28px] p-[3px]  text-[#ffffff91] hover:text-[#ffffff] cursor-pointer" />
-                    <Popover
-                        placement="topRight"
-                        trigger="click"
-                        _overlay={<PlayList />}
-                    >
-                        <BiPlusCircle className="w-[25px] h-[25px] laptop:w-[28px] laptop:h-[28px] p-[3px]  text-[#ffffff91] hover:text-[#ffffff] cursor-pointer" />
-                    </Popover>
-                    <Popover
-                        placement="topRight"
-                        trigger="click"
-                        _overlay={<RateStar />}
-                    >
-                        <BiStar className="w-[25px] h-[25px] laptop:w-[28px] laptop:h-[28px] p-[3px]  text-[#ffffff91] hover:text-[#ffffff] cursor-pointer" />
-                    </Popover>
-                </div>
-            </div>
-            <div className="h-full flex-1 w-full">
-                <AudioPlayer
-                    ref={audioRef}
-                    src={
-                        "https://bitdash-a.akamaihd.net/content/sintel/hls/playlist.m3u8"
-                    }
-                    showSkipControls={true}
-                    showJumpControls={false}
-                    customIcons={{
-                        play: <BiPlayCircle />,
-                        pause: <BiPauseCircle />,
-                    }}
-                    onPlay={() => setIsPlay(true)}
-                    onPause={() => setIsPlay(false)}
-                />
-            </div>
-            <div className="h-full  justify-end items-center gap-[10px] hidden laptop:flex pl-[30px]">
-                <Tooltip
-                    placement="top"
-                    color="volcano"
-                    title={"Tải xuống"}
-                    mouseLeaveDelay={0}
-                    overlayInnerStyle={{
-                        borderRadius: "5px",
-                    }}
-                >
-                    <BiDownload className="w-[25px] h-[25px] laptop:w-[28px] laptop:h-[28px] p-[3px] text-[#ffffff91] hover:text-[#ffffff] cursor-pointer" />
-                </Tooltip>
-                <Tooltip
-                    placement="top"
-                    color="volcano"
-                    title={"Báo cáo"}
-                    mouseLeaveDelay={0}
-                    overlayInnerStyle={{
-                        borderRadius: "5px",
-                    }}
-                >
-                    <BiFlag className="w-[25px] h-[25px] laptop:w-[28px] laptop:h-[28px] p-[3px]  text-[#ffffff91] hover:text-[#ffffff] cursor-pointer" />
-                </Tooltip>
-                <Popover
-                    placement="topRight"
-                    trigger="click"
-                    _overlay={<PlayList />}
-                >
-                    <BiPlusCircle className="w-[25px] h-[25px] laptop:w-[28px] laptop:h-[28px] p-[3px]  text-[#ffffff91] hover:text-[#ffffff] cursor-pointer" />
-                </Popover>
-                <Popover
-                    placement="topRight"
-                    trigger="click"
-                    _overlay={<RateStar />}
-                >
-                    <BiStar className="w-[25px] h-[25px] laptop:w-[28px] laptop:h-[28px] p-[3px]  text-[#ffffff91] hover:text-[#ffffff] cursor-pointer" />
-                </Popover>
-            </div>
-        </div>
+            )}
+        </>
     );
 };
 

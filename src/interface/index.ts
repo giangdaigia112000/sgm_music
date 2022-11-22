@@ -1,115 +1,63 @@
 export interface User {
-    id: string;
-    email: string;
-    name: string;
-    role: number;
-}
-
-export interface Product {
     id: number;
-    category_id: number;
-    sale: number;
     name: string;
-    thumb: string;
-    price: number;
-    description: string;
-    product_content: string;
-    is_show: boolean;
-    options: {
-        size: [
-            {
-                op: string;
-                price: number;
-            }
-        ];
-    };
-    has_option: boolean;
+    avatar: string;
+    nickname: string;
+    email: string;
+    active: number;
+    date_of_birth: string;
+    address: string;
+    permissions: string[];
     created_at: string;
     updated_at: string;
-    delete_at: string;
+}
+export interface Song {
+    id: number;
+    title?: string;
+    user_upload?: number;
+    album_id?: number;
+    time?: number;
+    description?: string;
+    lyrics?: string;
+    thumbnail?: string;
+    file_path?: string;
+    views?: 0;
+    created_at?: string;
+    updated_at?: string;
+    deleted_at?: string;
+    music_view_count?: number;
+    singer: User[];
 }
 
-export interface ProductCart {
+export interface Category {
     id: number;
-    quantity: number;
-    product_options: number;
-    products: {
-        name: string;
-        id: number;
-        thumb: string;
-        price: number;
-        options: {
-            size: [
-                {
-                    op: string;
-                    price: number;
-                }
-            ];
-        };
-    };
+    title: string;
+}
+
+export interface Album {
+    id: number;
+    user_id: number;
+    name: string;
+    created_at: string;
+    updated_at: string;
+    thumbnail: string;
+    music: Song[];
+    singer: User;
 }
 
 export interface Category {
     id: number;
     name: string;
-    is_show: number;
-    created_at: string;
-    updated_at: string;
-    img: string;
+    description: string;
+    avatar_path: string;
+    music: Song[];
 }
 
-export interface Shop {
+export interface Playlist {
     id: number;
-    address: string;
-    created_at: string;
-    updated_at: string;
-}
-
-export interface Order {
-    id: number;
-    user_id: number;
-    shop_id: number;
+    user_id?: number;
     name: string;
-    phone: string;
-    address: string;
-    totalprice: number;
-    status: number;
-    message: string;
-    created_at: string;
-    updated_at: string;
-    order_items: [
-        {
-            id: number;
-            order_id: number;
-            product_id: number;
-            quantity: number;
-            price: number;
-            product_options: {
-                op: string;
-                price: number;
-            };
-            created_at: string;
-            updated_at: string;
-            products: Product;
-        }
-    ];
-}
-
-export interface Blog {
-    id: number;
-    title: string;
-    thumb: string;
-    content: string;
-    desc: string;
-    type: number;
-    created_at: string;
-    updated_at: string;
-}
-
-export interface Slider {
-    id: number;
-    name: string;
-    image: string;
+    music: Song[];
     created_at: string;
     updated_at: string;
 }

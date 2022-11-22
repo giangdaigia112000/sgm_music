@@ -117,6 +117,15 @@ a {
     overflow: hidden;
     text-overflow: ellipsis;
 }
+
+.hiddentitle {
+    display: block;
+    display: -webkit-box;
+    -webkit-line-clamp: 1; /* số dòng hiển thị */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
 /* custom react h5 audio play  */
 .rhap_container {
     background-color: transparent;
@@ -170,4 +179,56 @@ a {
     height: 500px !important;
     overflow: hidden;
     overflow-y: scroll;
+}
+/* skeleton antd  */
+.ant-skeleton-image {
+    width: 100% !important;
+    height: 100% !important;
+}
+.ant-skeleton-input {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+/* modal antd */
+.ant-modal-content {
+    background-color: #46345f;
+    backdrop-filter: blur(19px);
+    border-radius: 10px;
+}
+.ant-modal-header {
+    background-color: #6c5094;
+    backdrop-filter: blur(19px);
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    border: none;
+}
+.ant-modal-header * {
+    color: #ffffff !important;
+}
+.ant-modal-body {
+    padding: 0;
+}
+.ant-modal-footer {
+    display: none;
+}
+
+.ant-upload-list-item {
+    height: 118px !important;
+}
+.ant-upload-list-item .ant-upload-span {
+    height: 100%;
+}
+
+.ant-upload-list-item .ant-upload-span * {
+    color: #ffffff;
+}
+.ant-upload-list-item .ant-upload-span a {
+    width: 100px;
+    height: 100px;
+}
+.ant-upload-list-item .ant-upload-span a img {
+    width: 100px;
+    height: 100px;
+    object-fit: cover !important;
 }

@@ -1,0 +1,21 @@
+.songHover {
+    > img {
+        transition: 0.3s ease-in-out;
+    }
+    > div {
+        transition: 0.3s ease-in-out;
+        backdrop-filter: blur(5px);
+        opacity: 0;
+    }
+    &:hover {
+        > img {
+            transform: scale(1.1);
+        }
+        > div {
+            opacity: 1;
+        }
+    }
+}
+.title {
+    flex: 1;
+}

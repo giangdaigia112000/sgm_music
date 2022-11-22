@@ -4,6 +4,7 @@ const nextConfig = {
     swcMinify: true,
     env: {
         HOST_NAME_API: process.env.HOST_NAME_API,
+        HOST_NAME_STREAM: process.env.HOST_NAME_STREAM,
     },
 };
 

@@ -1,87 +1,59 @@
-import { useEffect, useState } from 'react';
-import { NextPage } from 'next';
-import classNames from 'classnames/bind';
-import { Button, Form, Input } from 'antd';
-import { LockOutlined, UserOutlined } from '@ant-design/icons';
-import styles from './Login.module.scss';
-import { useAuth, UserLogin } from '../../contexts/auth';
-import { useRouter } from 'next/router';
+import { useEffect, useState } from "react";
+import { NextPage } from "next";
+import classNames from "classnames/bind";
+import { Button, DatePicker, Form, Input, Select, Tabs } from "antd";
+import { LockOutlined, UserOutlined } from "@ant-design/icons";
+import styles from "./Login.module.scss";
+import { useAuth, UserLogin } from "../../contexts/auth";
+import { useRouter } from "next/router";
+import FormLogin from "../../components/FormLogin";
+import FormRegister from "../../components/FormRegister";
 const cx = classNames.bind(styles);
-
+const { Option } = Select;
 const Login: NextPage = () => {
-  const [loading, setLoading] = useState<boolean>(false);
-  const { Login, SetLoading, user } = useAuth();
-  const { push } = useRouter();
-  const onFinish = async (values: UserLogin) => {
-    const userLogin = values;
-    setLoading(true);
-    await Login(userLogin);
-    setLoading(false);
-  };
-  const onFinishFailed = (errorInfo: any) => {
-    console.log('Failed:', errorInfo);
-  };
-  useEffect(() => {
-    if (user) {
-      push('/');
-    }
-  }, [user]);
-  return (
-    <main className={cx('login')}>
-      <div className={cx('container')}>
-        <div className={cx('logo')}>
-          <img src="/juwanfood-logo-short.png" alt="Logo vFast" />
-        </div>
-        <div className={cx('login-form')}>
-          <h1>JuwanFood</h1>
-          <div className={cx('form-main')}>
-            <Form
-              name="basic"
-              labelCol={{ span: 8 }}
-              wrapperCol={{ span: 16 }}
-              initialValues={{ remember: true }}
-              onFinish={onFinish}
-              onFinishFailed={onFinishFailed}
-              autoComplete="off"
-            >
-              <Form.Item
-                label="Tên đăng nhập"
-                name="email"
-                rules={[{ required: true, message: 'Nhập vào tài khoản!' }]}
-              >
-                <Input
-                  size="large"
-                  prefix={<UserOutlined className="site-form-item-icon" />}
-                />
-              </Form.Item>
-
-              <Form.Item
-                label="Mật khẩu"
-                name="password"
-                rules={[{ required: true, message: 'Nhập vào mật khẩu!' }]}
-              >
-                <Input.Password
-                  size="large"
-                  prefix={<LockOutlined className="site-form-item-icon" />}
-                />
-              </Form.Item>
-
-              <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
-                <Button
-                  type="primary"
-                  htmlType="submit"
-                  size="large"
-                  loading={loading}
-                  danger
+    const [loading, setLoading] = useState<boolean>(false);
+    const { Login, SetLoading, user } = useAuth();
+    const { push } = useRouter();
+    const onFinish = async (values: UserLogin) => {
+        const userLogin = values;
+        setLoading(true);
+        await Login(userLogin);
+        setLoading(false);
+    };
+    const onFinishFailed = (errorInfo: any) => {
+        console.log("Failed:", errorInfo);
+    };
+    useEffect(() => {
+        if (user) {
+            push("/");
+        }
+    }, [user]);
+    return (
+        <main
+            className={`${cx(
+                "bg-image"
+            )} w-full p-[5%] flex justify-center text-[#fff] rounded-xl overflow-hidden flex-col tablet:flex-row `}
+            style={{
+                boxShadow:
+                    "rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px",
+            }}
+        >
+            <div className=" p-[20px]  tablet:max-w-[800px] rounded-xl">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img className="w-[50%]" src="/sgm.png" alt="sgm" />
+                <Tabs
+                    defaultActiveKey="1"
+                    className="text-[#fff] font-semibold "
                 >
-                  Đăng nhập
-                </Button>
-              </Form.Item>
-            </Form>
-          </div>
-        </div>
-      </div>
-    </main>
-  );
+                    <Tabs.TabPane tab="Đăng nhập" key="1">
+                        <FormLogin />
+                    </Tabs.TabPane>
+                    <Tabs.TabPane tab="Đăng ký" key="2">
+                        <FormRegister />
+                    </Tabs.TabPane>
+                </Tabs>
+            </div>
+        </main>
+    );
 };
 export default Login;

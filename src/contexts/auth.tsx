@@ -1,6 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import { login, whoAmI, resetPassword } from "../service";
 import { notiError, notiSuccess } from "../utils/notification";
 
 export type User = {
@@ -55,39 +54,39 @@ export const AuthProvider = ({ children }: any) => {
     };
 
     const ChangePassword = async (value: ChangePassWord) => {
-        try {
-            const res = await resetPassword(value);
-            notiSuccess("Đổi mật khẩu thành công.");
-        } catch (error) {
-            console.log({ error });
-            notiError("Không thành công!");
-        }
+        // try {
+        //     const res = await resetPassword(value);
+        //     notiSuccess("Đổi mật khẩu thành công.");
+        // } catch (error) {
+        //     console.log({ error });
+        //     notiError("Không thành công!");
+        // }
     };
     const Login = async (userLogin: UserLogin) => {
-        try {
-            const res = await login(userLogin);
-            const { token } = res.data;
-            setStoreLocal("id", token);
-            await authenticate();
-            push("/");
-            notiSuccess("Đăng nhập thành công!");
-        } catch (error) {
-            console.log({ error });
-            notiError("Đăng nhập thất bại!");
-        }
+        // try {
+        //     const res = await login(userLogin);
+        //     const { token } = res.data;
+        //     setStoreLocal("id", token);
+        //     await authenticate();
+        //     push("/");
+        //     notiSuccess("Đăng nhập thành công!");
+        // } catch (error) {
+        //     console.log({ error });
+        //     notiError("Đăng nhập thất bại!");
+        // }
     };
     const SetLoading = (islogin: boolean) => {
         setLoading(islogin);
     };
     const authenticate = async () => {
-        try {
-            const res = await whoAmI();
-            setUser(res.data);
-        } catch (error) {
-            removeStoreLocal("id");
-            push("/login");
-            console.log({ error });
-        }
+        // try {
+        //     const res = await whoAmI();
+        //     setUser(res.data);
+        // } catch (error) {
+        //     removeStoreLocal("id");
+        //     push("/login");
+        //     console.log({ error });
+        // }
     };
     useEffect(() => {
         const token = getStoreLocal("id");

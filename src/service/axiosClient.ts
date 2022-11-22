@@ -9,12 +9,12 @@ const getStoreLocal = (item: string) => {
 const axiosClient = axios.create({
     baseURL: process.env.HOST_NAME_API,
     headers: {
-        accept: "application/json",
+        accept: "*/*",
     },
 });
 
 axiosClient.interceptors.request.use(async (config: AxiosRequestConfig) => {
-    const token = getStoreLocal("id") as string;
+    const token = getStoreLocal("token") as string;
     config.headers = {
         Authorization: ` Bearer ${token}`,
     };

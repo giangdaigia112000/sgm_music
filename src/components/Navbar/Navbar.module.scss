@@ -11,6 +11,8 @@
         padding: 5px;
         height: 100%;
         width: 100%;
+        display: flex;
+        flex-direction: column;
         .nav-active {
             width: 100%;
             height: 50px;
@@ -91,6 +93,73 @@
                 }
             }
         }
+        .vip {
+            width: 100%;
+            padding: 5px;
+            .vip-main {
+                background-image: linear-gradient(
+                    117deg,
+                    #5a4be7,
+                    #c86dd7 102%
+                );
+                text-align: center;
+                padding: 10px;
+                border-radius: 10px;
+                > p {
+                    display: none;
+                }
+                > span {
+                    gap: 4px;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    width: 100%;
+                    height: 30px;
+                    border-radius: 20px;
+                    background-color: #ffdb00;
+                    color: #393243;
+                    > span {
+                        display: none;
+                    }
+                }
+            }
+        }
+        .playlist {
+            .nav-title {
+                color: #ffffffb6;
+                visibility: hidden;
+                display: flex;
+                width: calc(100% - 50px);
+                align-items: center;
+                font-size: 16px;
+                font-weight: 600;
+                overflow: hidden;
+                opacity: 0;
+            }
+            > div {
+                &:hover {
+                    * {
+                        color: #ffffff;
+                    }
+                }
+            }
+            .playlist__item {
+                .title {
+                    flex: 1;
+                    display: flex;
+                    width: 100%;
+                    justify-content: space-between;
+                    align-items: center;
+                    height: 0;
+                    overflow: hidden;
+                    visibility: hidden;
+                    opacity: 0;
+                    span {
+                        flex: 1;
+                    }
+                }
+            }
+        }
     }
 }
 .nav--active {
@@ -123,6 +192,37 @@
                 }
                 .active {
                     background-color: #2c3e48;
+                    border-radius: 10px;
+                }
+            }
+        }
+        .vip {
+            .vip-main {
+                > p {
+                    display: block;
+                }
+                > span {
+                    > span {
+                        display: block;
+                    }
+                }
+            }
+        }
+        .playlist {
+            .nav-title {
+                visibility: visible;
+                opacity: 1;
+                transition-delay: 0.2s;
+            }
+            .playlist__item {
+                .title {
+                    visibility: visible;
+                    opacity: 1;
+                    transition-delay: 0.4s;
+                    height: 100%;
+                }
+                .icon-item {
+                    display: none;
                 }
             }
         }

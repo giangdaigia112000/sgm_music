@@ -66,6 +66,8 @@
     .header-profile {
         height: 100%;
         position: relative;
+        display: flex;
+        align-items: center;
         .header-profile_show {
             height: 100%;
             display: flex;

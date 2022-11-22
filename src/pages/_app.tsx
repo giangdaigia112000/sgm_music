@@ -8,6 +8,7 @@ import "react-quill/dist/quill.snow.css";
 import "react-h5-audio-player/lib/styles.css";
 // ----import file-----
 import "../styles/globals.css";
+import "../styles/globals.scss";
 import store from "../store";
 import Navbar from "../components/Navbar";
 import Header from "../components/Header";
@@ -32,7 +33,7 @@ function MyApp({ Component, pageProps }: AppProps) {
                     <Navbar />
                     <div className="body">
                         <Header />
-                        <div className="body-content px-[10px] laptop:px-[50px] pt-[10px]">
+                        <div className="body-content px-[10px] laptop:px-[50px] pt-[10px] relative">
                             <Component {...pageProps} />
                         </div>
                         <PlayAudio />
