@@ -1,3 +1,4 @@
+import { Col, Row } from "antd";
 import { useEffect } from "react";
 import Song from "../components/Song";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
@@ -19,8 +20,8 @@ const BXH = () => {
                 <h1 className=" text-[#fff] font-bold text-sm tablet:text-xl m-0 relative pb-[20px]">
                     BẢNG XẾP HẠNG BÀI HÁT
                 </h1>
-                <div className="w-full flex justify-center">
-                    <div className="max-w-[700px]">
+                <div className="w-full flex justify-center flex-col tablet:flex-row items-start">
+                    <div className="w-full  tablet:w-[700px] flex-1 bg-[#6f048a59] p-[20px] mr-[10px] rounded-md">
                         {listSongBXH.length > 0 &&
                             listSongBXH.map((song, index) => (
                                 <div
@@ -40,7 +41,7 @@ const BXH = () => {
                                                     : "#e35050"
                                             }`,
                                         }}
-                                        className=" font-bold text-[#fff0] tablet:pr-[40px]"
+                                        className=" font-bold text-[#fff0] "
                                     >
                                         {index + 1}
                                     </span>
@@ -49,6 +50,15 @@ const BXH = () => {
                                         <Song song={song} />
                                     </div>
                                 </div>
+                            ))}
+                    </div>
+                    <div>
+                        <h1 className="text-[#fff] text-xs tablet:text-base font-bold hiddentitle pt-[8px] pb-[10px]">
+                            Gợi ý cho bạn
+                        </h1>
+                        {listSongBXH.length > 0 &&
+                            listSongBXH.map((song) => (
+                                <Song key={song.id} song={song} />
                             ))}
                     </div>
                 </div>

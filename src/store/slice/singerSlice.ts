@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { Song, User } from "../../interface";
-import { uploadImage, uploadMp3 } from "../../service";
+import { Album, Song, User } from "../../interface";
+import { dowloadFile, uploadImage, uploadMp3 } from "../../service";
 import axiosClient from "../../service/axiosClient";
 import { notiError, notiSuccess } from "../../utils/notification";
 import { userCheckMe } from "./loginSlice";
@@ -30,6 +30,8 @@ export const createSong = createAsyncThunk(
     async (data: any, thunkAPI) => {
         const { title, description, free, time, id, singers, categories } =
             data;
+        console.log(data);
+
         const imagePath = await uploadImage(data.thumbnailFile);
         const mp3Path = await uploadMp3(data.mp3File);
         singers.push(id);
@@ -51,16 +53,7 @@ export const createSong = createAsyncThunk(
 export const updateSong = createAsyncThunk(
     "updateSong",
     async (data: any, thunkAPI) => {
-        const {
-            idSong,
-            title,
-            description,
-            free,
-            time,
-            id,
-            singers,
-            categories,
-        } = data;
+        const { id, idSong, title, description, free, time, singers } = data;
 
         let updateData = {
             title,
@@ -68,15 +61,10 @@ export const updateSong = createAsyncThunk(
             free,
             time,
             singers,
-            categories,
             _method: "put",
         };
 
         let imagePath;
-        if (data.thumbnailFile) {
-            imagePath = await uploadImage(data.thumbnailFile);
-            Object.assign(updateData, { thumbnail: imagePath });
-        }
 
         singers.push(id);
         const res = await axiosClient.post(`/api/musics/${idSong}`, updateData);
@@ -177,9 +165,19 @@ export const updateUserPass = createAsyncThunk(
     }
 );
 
+export const dowload = createAsyncThunk(
+    "dowload",
+    async (file_path: string) => {
+        const res = await dowloadFile(file_path + ".mp3");
+        return res;
+    }
+);
+
 export interface SingerState {
     allSinger: User[];
     singerId: number;
+    updateSong: Song;
+    updateAlbum: Album;
     detailSinger: any | null;
     loadingApi: boolean;
     loadingCreate: boolean;
@@ -195,6 +193,8 @@ const initialState: SingerState = {
     loadingCreate: false,
     loadingProfile: false,
     reload: false,
+    updateSong: {} as Song,
+    updateAlbum: {} as Album,
 };
 
 export const SingerSlice = createSlice({
@@ -206,6 +206,12 @@ export const SingerSlice = createSlice({
         },
         setReload: (state) => {
             state.reload = !state.reload;
+        },
+        setSongUpdate: (state, action: PayloadAction<Song>) => {
+            state.updateSong = action.payload;
+        },
+        setAlbumUpdate: (state, action: PayloadAction<Album>) => {
+            state.updateAlbum = action.payload;
         },
     },
     extraReducers: {
@@ -383,9 +389,20 @@ export const SingerSlice = createSlice({
             action: PayloadAction<any>
         ) => {},
         //////////////////////////////////////////////////////////////////
+        [dowload.pending.toString()]: (state) => {},
+        [dowload.fulfilled.toString()]: (
+            state,
+            action: PayloadAction<any>
+        ) => {},
+        [dowload.rejected.toString()]: (
+            state,
+            action: PayloadAction<any>
+        ) => {},
+        //////////////////////////////////////////////////////////////////
     },
 });
 
 // Action creators are generated for each case reducer function
-export const { setSingerId, setReload } = SingerSlice.actions;
+export const { setSingerId, setReload, setSongUpdate, setAlbumUpdate } =
+    SingerSlice.actions;
 export default SingerSlice.reducer;

@@ -6,7 +6,7 @@ import {
     BiMessageSquareAdd,
     BiPlayCircle,
 } from "react-icons/bi";
-import { Album } from "../../interface";
+import { Album, Song } from "../../interface";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { setAlbumId } from "../../store/slice/albumSlice";
 import { concatSongList, setSongList } from "../../store/slice/playSlice";
@@ -20,6 +20,8 @@ interface Prop {
 }
 const ListAlbum = (prop: Prop) => {
     const { listSongPlay } = useAppSelector((state) => state.play);
+    const { user } = useAppSelector((state) => state.login);
+
     const dispatch = useAppDispatch();
 
     const { push } = useRouter();
@@ -86,7 +88,18 @@ const ListAlbum = (prop: Prop) => {
                                                                 push("/play");
                                                                 dispatch(
                                                                     setSongList(
-                                                                        album.music
+                                                                        album.music.filter(
+                                                                            (
+                                                                                music
+                                                                            ) =>
+                                                                                !(
+                                                                                    (user?.vip ===
+                                                                                        0 ||
+                                                                                        !user) &&
+                                                                                    music.free ===
+                                                                                        0
+                                                                                )
+                                                                        )
                                                                     )
                                                                 );
                                                             }}
@@ -123,15 +136,29 @@ const ListAlbum = (prop: Prop) => {
                                                                     );
                                                                     return;
                                                                 }
+
                                                                 const listMusicCheck =
-                                                                    album.music.filter(
-                                                                        (
-                                                                            music
-                                                                        ) =>
-                                                                            !listId.includes(
-                                                                                music.id
-                                                                            )
-                                                                    );
+                                                                    album.music
+                                                                        .filter(
+                                                                            (
+                                                                                music
+                                                                            ) =>
+                                                                                !(
+                                                                                    (user?.vip ===
+                                                                                        0 ||
+                                                                                        !user) &&
+                                                                                    music.free ===
+                                                                                        0
+                                                                                )
+                                                                        )
+                                                                        .filter(
+                                                                            (
+                                                                                music
+                                                                            ) =>
+                                                                                !listId.includes(
+                                                                                    music?.id as number
+                                                                                )
+                                                                        );
                                                                 if (
                                                                     listMusicCheck.length ===
                                                                     0
@@ -144,7 +171,7 @@ const ListAlbum = (prop: Prop) => {
                                                                 push("/play");
                                                                 dispatch(
                                                                     concatSongList(
-                                                                        listMusicCheck
+                                                                        listMusicCheck as Song[]
                                                                     )
                                                                 );
                                                             }}

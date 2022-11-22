@@ -21,7 +21,7 @@ const ListSinger = ({ listSinger }: Prop) => {
     const { push } = useRouter();
     const dispatch = useAppDispatch();
     return (
-        <div className="w-full pt-[20px] pb-[300px]">
+        <div className="w-full pt-[20px] ">
             <Row justify="start" align="middle">
                 {listSinger.length === 0 ? (
                     <>

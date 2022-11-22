@@ -1,15 +1,27 @@
+import { Col, Row } from "antd";
 import moment from "moment";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import ListAlbum from "../components/ListAlbum";
+import Song from "../components/Song";
 import SongPlay from "../components/SongPlay";
-import { Song } from "../interface";
-import { useAppSelector } from "../store/hooks";
+import { useAppDispatch, useAppSelector } from "../store/hooks";
+import { getRecommendSong } from "../store/slice/playSlice";
 const mang = [1, 2, 3, 4, 5, 6];
 const Play = () => {
     const [isPlaylist, setIsPlaylist] = useState<boolean>(true);
     const { push } = useRouter();
-    const { listSongPlay, songActive } = useAppSelector((state) => state.play);
+    const { listSongPlay, songActive, listSongRecommend } = useAppSelector(
+        (state) => state.play
+    );
+    const { listSongHome } = useAppSelector((state) => state.home);
+    console.log(listSongPlay);
+
+    const ddisspatch = useAppDispatch();
+    useEffect(() => {
+        if (listSongPlay.length === 0) return;
+        ddisspatch(getRecommendSong(listSongPlay[songActive].id));
+    }, [listSongPlay[songActive]]);
     return (
         <>
             <div className="bg-blur absolute"></div>
@@ -71,9 +83,14 @@ const Play = () => {
                         <h1 className="text-[#fff] text-xs tablet:text-base font-bold hiddentitle pt-[8px] pb-[10px]">
                             Gợi ý cho bạn
                         </h1>
-                        {/* {mang.map((_, idx) => (
-                            <SongPlay song={[] as Song} key={idx} />
-                        ))} */}
+                        <Row justify="start" align="middle">
+                            {listSongRecommend.length > 0 &&
+                                listSongRecommend.map((song) => (
+                                    <Col xs={24} md={24} xl={12} key={song.id}>
+                                        <Song song={song} />
+                                    </Col>
+                                ))}
+                        </Row>
                     </div>
                 </div>
             </div>

@@ -11,7 +11,7 @@ import {
     BiIdCard,
     BiMusic,
 } from "react-icons/bi";
-import { RiVipFill } from "react-icons/ri";
+import { RiVipCrown2Fill, RiVipFill } from "react-icons/ri";
 import styles from "./Navbar.module.scss";
 import { Button, Form, Input, Modal, Popover, Tooltip } from "antd";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
@@ -30,6 +30,10 @@ import {
 import AddSong from "../AddSong";
 import AddPlaylist from "../AddPlaylist";
 import UpdatePlaylist from "../UpdatePlaylist";
+import { notiWarning } from "../../utils/notification";
+
+import PayModal from "../PayModal";
+import moment from "moment";
 
 const cx = classNames.bind(styles);
 const navList = [
@@ -73,12 +77,13 @@ function Navbar() {
         (state) => state.playlist
     );
     const dispatch = useAppDispatch();
-    console.log(allPlaylist);
+    console.log(user);
 
     const [openModalAddPlaylist, setOpenModalAddPlaylist] =
         useState<boolean>(false);
     const [openUpdatePlaylist, setOpenUpdatePlaylist] =
         useState<boolean>(false);
+    const [openPay, setOpenPay] = useState<boolean>(false);
     useEffect(() => {
         if (!user) return;
         dispatch(getAllPlaylist());
@@ -187,58 +192,73 @@ function Navbar() {
                             <p className="font-bold">
                                 Nghe nhạc không giới hạn
                             </p>
-                            <span className="font-semibold cursor-pointer ">
+                            <span
+                                onClick={() => {
+                                    if (!user) {
+                                        notiWarning("Bạn cần phải đăng nhập");
+                                        return;
+                                    }
+                                    if (user.vip === 1) {
+                                        notiWarning("Bạn đã là thành viên Vip");
+                                        return;
+                                    }
+                                    setOpenPay(true);
+                                }}
+                                className="font-semibold cursor-pointer "
+                            >
                                 <span>NÂNG CẤP VIP</span>
                                 <RiVipFill className="w-[20px] h-[20px]" />
                             </span>
                         </div>
                     </div>
                     {user && (
-                        <div
-                            className={`flex-1 flex justify-between flex-col ${cx(
-                                "playlist"
-                            )}`}
-                        >
-                            <div className="w-full">
-                                <>
-                                    <div className="w-full flex items-center">
-                                        <div className="w-[60px] h-[60px] flex justify-center items-center">
-                                            {/* eslint-disable-next-line @next/next/no-img-element */}
-                                            <img
-                                                className="w-[30px] h-[30px]"
-                                                src="/my-playlist.svg"
-                                                alt="playlist"
-                                            />
-                                        </div>
-                                        <span className={cx("nav-title")}>
-                                            Playlist
+                        <>
+                            {user.vip === 1 && (
+                                <div
+                                    className={`w-full flex justify-center flex-col items-center ${cx(
+                                        "vip-noti"
+                                    )}`}
+                                >
+                                    <RiVipCrown2Fill className="w-[30px] h-[30px] text-[#e1fa00]" />
+                                    <span>
+                                        Gói vip hết hạn vào{" "}
+                                        <span className="font-bold">
+                                            {moment(user.vip_expried).format(
+                                                "YYYY-MM-DD"
+                                            )}
                                         </span>
-                                    </div>
-                                    {allPlaylist.length > 0 &&
-                                        allPlaylist.map((playlist) => (
-                                            <div
-                                                key={playlist.id}
-                                                className={`w-full pl-[20px] flex justify-start items-center cursor-pointer h-[40px] ${cx(
-                                                    "playlist__item"
-                                                )}`}
-                                            >
-                                                <BiMusic
-                                                    onClick={() => {
-                                                        dispatch(
-                                                            setPlaylistId(
-                                                                playlist.id
-                                                            )
-                                                        );
-                                                        push(
-                                                            `/playlistdetail/${playlist.id}`
-                                                        );
-                                                    }}
-                                                    className={`w-[20px] h-[20px] laptop:w-[28px] laptop:h-[28px] p-[3px] ${cx(
-                                                        "icon-item"
-                                                    )}`}
+                                    </span>
+                                </div>
+                            )}
+                            <div
+                                className={`flex-1 flex justify-between flex-col ${cx(
+                                    "playlist"
+                                )}`}
+                            >
+                                <div className="w-full">
+                                    <>
+                                        <div className="w-full flex items-center">
+                                            <div className="w-[60px] h-[60px] flex justify-center items-center">
+                                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                                <img
+                                                    className="w-[30px] h-[30px]"
+                                                    src="/my-playlist.svg"
+                                                    alt="playlist"
                                                 />
-                                                <div className={cx("title")}>
-                                                    <span
+                                            </div>
+                                            <span className={cx("nav-title")}>
+                                                Playlist
+                                            </span>
+                                        </div>
+                                        {allPlaylist.length > 0 &&
+                                            allPlaylist.map((playlist) => (
+                                                <div
+                                                    key={playlist.id}
+                                                    className={`w-full pl-[20px] flex justify-start items-center cursor-pointer h-[40px] ${cx(
+                                                        "playlist__item"
+                                                    )}`}
+                                                >
+                                                    <BiMusic
                                                         onClick={() => {
                                                             dispatch(
                                                                 setPlaylistId(
@@ -249,48 +269,71 @@ function Navbar() {
                                                                 `/playlistdetail/${playlist.id}`
                                                             );
                                                         }}
+                                                        className={`w-[20px] h-[20px] laptop:w-[28px] laptop:h-[28px] p-[3px] ${cx(
+                                                            "icon-item"
+                                                        )}`}
+                                                    />
+                                                    <div
+                                                        className={cx("title")}
                                                     >
-                                                        {playlist.name}
-                                                    </span>
-                                                    <Popover
-                                                        placement="right"
-                                                        trigger="click"
-                                                        _overlay={
-                                                            <PopoverPlayer
-                                                                id={playlist.id}
-                                                            />
-                                                        }
-                                                    >
-                                                        <BiDotsHorizontalRounded className="text-base bg-[#62616b] w-[28px] h-[28px] rounded-full p-[4px] cursor-pointer " />
-                                                    </Popover>
+                                                        <span
+                                                            onClick={() => {
+                                                                dispatch(
+                                                                    setPlaylistId(
+                                                                        playlist.id
+                                                                    )
+                                                                );
+                                                                push(
+                                                                    `/playlistdetail/${playlist.id}`
+                                                                );
+                                                            }}
+                                                        >
+                                                            {playlist.name}
+                                                        </span>
+                                                        <Popover
+                                                            placement="right"
+                                                            trigger="click"
+                                                            _overlay={
+                                                                <PopoverPlayer
+                                                                    id={
+                                                                        playlist.id
+                                                                    }
+                                                                />
+                                                            }
+                                                        >
+                                                            <BiDotsHorizontalRounded className="text-base bg-[#62616b] w-[28px] h-[28px] rounded-full p-[4px] cursor-pointer " />
+                                                        </Popover>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        ))}
-                                </>
-                            </div>
-                            <div
-                                onClick={() => {
-                                    setOpenModalAddPlaylist(true);
-                                }}
-                                className="w-full flex items-center cursor-pointer "
-                            >
-                                <div className="w-[60px] h-[60px] flex justify-center items-center">
-                                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                                    <BsPlusSquareDotted className=" w-[30px] h-[30px]" />
+                                            ))}
+                                    </>
                                 </div>
-                                <span className={cx("nav-title")}>
-                                    Tạo Playlist
-                                </span>
+                                <div
+                                    onClick={() => {
+                                        setOpenModalAddPlaylist(true);
+                                    }}
+                                    className="w-full flex items-center cursor-pointer "
+                                >
+                                    <div className="w-[60px] h-[60px] flex justify-center items-center">
+                                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                                        <BsPlusSquareDotted className=" w-[30px] h-[30px]" />
+                                    </div>
+                                    <span className={cx("nav-title")}>
+                                        Tạo Playlist
+                                    </span>
+                                </div>
+                                <Modal
+                                    title="Thêm Playlist"
+                                    centered
+                                    onCancel={() =>
+                                        setOpenModalAddPlaylist(false)
+                                    }
+                                    visible={openModalAddPlaylist}
+                                >
+                                    <AddPlaylist />
+                                </Modal>
                             </div>
-                            <Modal
-                                title="Thêm Playlist"
-                                centered
-                                onCancel={() => setOpenModalAddPlaylist(false)}
-                                visible={openModalAddPlaylist}
-                            >
-                                <AddPlaylist />
-                            </Modal>
-                        </div>
+                        </>
                     )}
                 </div>
             </div>
@@ -301,6 +344,14 @@ function Navbar() {
                 visible={openUpdatePlaylist}
             >
                 <UpdatePlaylist id={playlistUpdateId} />
+            </Modal>
+            <Modal
+                title="Thanh toán gói VIP SGM_MUSIC"
+                centered
+                onCancel={() => setOpenPay(false)}
+                visible={openPay}
+            >
+                <PayModal />
             </Modal>
         </>
     );

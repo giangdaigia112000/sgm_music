@@ -16,16 +16,24 @@ import {
     BiPlusCircle,
     BiStar,
 } from "react-icons/bi";
+import { RiVipCrown2Fill } from "react-icons/ri";
 import { Song } from "../../interface";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import { userReport } from "../../store/slice/loginSlice";
 import { updatePlaylist } from "../../store/slice/playlistSlice";
 import { pushSongList, setSongList } from "../../store/slice/playSlice";
-import { setSingerId } from "../../store/slice/singerSlice";
+import { dowload, setSingerId } from "../../store/slice/singerSlice";
 import { notiSuccess, notiWarning } from "../../utils/notification";
 import styles from "./Song.module.scss";
 interface Props {
     song: Song;
 }
+
+const report = [
+    "Vi phạm bản quyền",
+    "Ngôn ngữ gây đả kích",
+    "Nội dung phản cảm",
+];
 const SongDetail = ({ song }: Props) => {
     const { listSongPlay, songActive } = useAppSelector((state) => state.play);
     const { user } = useAppSelector((state) => state.login);
@@ -97,24 +105,60 @@ const SongDetail = ({ song }: Props) => {
                         Thêm vào Phát
                     </span>
                 </div>
-                <div className="w-full text-xs laptop:text-sm h-[40px] flex gap-[5px] items-center text-[#fff] px-[10px] cursor-pointer hover:bg-[#493961]">
-                    <a
-                        href={`${process.env.HOST_NAME_STREAM}/${pathname}.mp3`}
-                        download
-                        target="_blank"
-                    >
-                        <BiDownload className="w-[20px] h-[20px] laptop:w-[28px] laptop:h-[28px] p-[3px]" />
-                        <span className="flex items-center flex-1 justify-between">
-                            Tải bài hát xuống
-                        </span>
-                    </a>
-                </div>
-                <div className="w-full text-xs laptop:text-sm h-[40px] flex gap-[5px] items-center text-[#fff] px-[10px] cursor-pointer hover:bg-[#493961]">
-                    <BiFlag className="w-[20px] h-[20px] laptop:w-[28px] laptop:h-[28px] p-[3px]" />
+                <div
+                    onClick={() => {
+                        if (user?.vip === 0 && song.free === 0) {
+                            notiWarning(
+                                "Bạn cần là thành viên vip để tải bài hát này."
+                            );
+                            return;
+                        }
+                        dispatch(dowload(pathname as string));
+                    }}
+                    className="w-full text-xs laptop:text-sm h-[40px] flex gap-[5px] items-center text-[#fff] px-[10px] cursor-pointer hover:bg-[#493961]"
+                >
+                    <BiDownload className="w-[20px] h-[20px] laptop:w-[28px] laptop:h-[28px] p-[3px]" />
                     <span className="flex items-center flex-1 justify-between">
-                        Báo cáo
+                        Tải bài hát xuống
                     </span>
                 </div>
+                {user && (
+                    <Popover
+                        placement="right"
+                        trigger="click"
+                        _overlay={
+                            <div className="w-[160px] laptop:w-[200px] py-[10px] text-[#fff] pl-[10px]">
+                                {report.map((pl, idx) => (
+                                    <div
+                                        onClick={() => {
+                                            dispatch(
+                                                userReport({
+                                                    id: song.id,
+                                                    content: pl,
+                                                })
+                                            );
+                                        }}
+                                        key={idx}
+                                        className="w-full pl-[2px] text-xs laptop:text-sm h-[40px] flex gap-[5px] items-center text-[#fff]  cursor-pointer hover:bg-[#493961]"
+                                    >
+                                        <span className="flex items-center flex-1 justify-between">
+                                            {pl}
+                                        </span>
+                                    </div>
+                                ))}
+                            </div>
+                        }
+                    >
+                        <div className="w-full text-xs laptop:text-sm h-[40px] flex gap-[5px] items-center text-[#fff] px-[10px] cursor-pointer hover:bg-[#493961]">
+                            <BiFlag className="w-[20px] h-[20px] laptop:w-[28px] laptop:h-[28px] p-[3px]" />
+                            <span className="flex items-center flex-1 justify-between">
+                                Báo cáo
+                                <BiChevronRight className="w-[20px] h-[20px] laptop:w-[28px] laptop:h-[28px] p-[3px]" />
+                            </span>
+                        </div>
+                    </Popover>
+                )}
+
                 {user && (
                     <Popover
                         placement="right"
@@ -177,11 +221,25 @@ const SongDetail = ({ song }: Props) => {
                         />
                     ) : (
                         <BiPlay
-                            onClick={() => dispatch(setSongList([song]))}
+                            onClick={() => {
+                                if (
+                                    (user?.vip === 0 || !user) &&
+                                    song.free === 0
+                                ) {
+                                    notiWarning(
+                                        "Bạn cần là thành viên vip để nghe bài hát này."
+                                    );
+                                    return;
+                                }
+                                dispatch(setSongList([song]));
+                            }}
                             className="w-[25px] h-[25px] tablet:w-[40px] tablet:h-[40px]   text-[#ffffff91] hover:text-[#ffffff] cursor-pointer"
                         />
                     )}
                 </div>
+                {song.free === 0 && (
+                    <RiVipCrown2Fill className="w-[22px] h-[22px] text-[#e1fa00] absolute right-0 bottom-0" />
+                )}
             </div>
             <div className={styles.title}>
                 <h1 className="text-[#fff] text-xs tablet:text-sm font-bold hiddentitle pt-[8px] m-0">

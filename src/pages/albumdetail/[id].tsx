@@ -15,6 +15,7 @@ const AlbumDetail = () => {
     const { detailAlbum, loadingApi, albumId } = useAppSelector(
         (state) => state.album
     );
+    const { user } = useAppSelector((state) => state.login);
     const dispatch = useAppDispatch();
     const { push, query } = useRouter();
     useEffect(() => {
@@ -59,7 +60,17 @@ const AlbumDetail = () => {
                                             }
                                             push("/play");
                                             dispatch(
-                                                setSongList(detailAlbum.music)
+                                                setSongList(
+                                                    detailAlbum.music.filter(
+                                                        (music) =>
+                                                            !(
+                                                                (user?.vip ===
+                                                                    0 ||
+                                                                    !user) &&
+                                                                music.free === 0
+                                                            )
+                                                    )
+                                                )
                                             );
                                         }}
                                         className=" cursor-pointer flex gap-[5px] items-center text-sm tablet:text-base bg-[#9b4de0] p-[5px] w-[100px] tablet:w-[120px] justify-center rounded-3xl  "

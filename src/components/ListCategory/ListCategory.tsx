@@ -22,6 +22,8 @@ interface Prop {
 const ListCategory = ({ listcate }: Prop) => {
     const { push } = useRouter();
     const { listSongPlay } = useAppSelector((state) => state.play);
+    const { user } = useAppSelector((state) => state.login);
+
     const dispatch = useAppDispatch();
     return (
         <div className="w-full pt-[20px]">
@@ -85,7 +87,18 @@ const ListCategory = ({ listcate }: Prop) => {
                                                             push("/play");
                                                             dispatch(
                                                                 setSongList(
-                                                                    cate.music
+                                                                    cate.music.filter(
+                                                                        (
+                                                                            music
+                                                                        ) =>
+                                                                            !(
+                                                                                (user?.vip ===
+                                                                                    0 ||
+                                                                                    !user) &&
+                                                                                music.free ===
+                                                                                    0
+                                                                            )
+                                                                    )
                                                                 )
                                                             );
                                                         }}
@@ -121,12 +134,27 @@ const ListCategory = ({ listcate }: Prop) => {
                                                                 return;
                                                             }
                                                             const listMusicCheck =
-                                                                cate.music.filter(
-                                                                    (music) =>
-                                                                        !listId.includes(
-                                                                            music.id
-                                                                        )
-                                                                );
+                                                                cate.music
+                                                                    .filter(
+                                                                        (
+                                                                            music
+                                                                        ) =>
+                                                                            !(
+                                                                                (user?.vip ===
+                                                                                    0 ||
+                                                                                    !user) &&
+                                                                                music.free ===
+                                                                                    0
+                                                                            )
+                                                                    )
+                                                                    .filter(
+                                                                        (
+                                                                            music
+                                                                        ) =>
+                                                                            !listId.includes(
+                                                                                music.id
+                                                                            )
+                                                                    );
                                                             if (
                                                                 listMusicCheck.length ===
                                                                 0

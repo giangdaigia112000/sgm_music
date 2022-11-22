@@ -124,6 +124,11 @@
                 }
             }
         }
+        .vip-noti {
+            > span {
+                display: none;
+            }
+        }
         .playlist {
             .nav-title {
                 color: #ffffffb6;
@@ -162,6 +167,7 @@
         }
     }
 }
+
 .nav--active {
     width: 220px;
     .nav-container {
@@ -206,6 +212,11 @@
                         display: block;
                     }
                 }
+            }
+        }
+        .vip-noti {
+            > span {
+                display: block;
             }
         }
         .playlist {

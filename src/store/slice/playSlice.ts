@@ -12,14 +12,26 @@ export const getPlaySong = createAsyncThunk(
     }
 );
 
+export const getRecommendSong = createAsyncThunk(
+    "getRecommendSong",
+    async (id: number, thunkAPI) => {
+        const res = await axiosClient.post(`/api/recommend/${id}`, {
+            _method: "get",
+        });
+        return res.data;
+    }
+);
+
 export interface PlayState {
     listSongPlay: Song[];
     songActive: number;
+    listSongRecommend: Song[];
 }
 
 const initialState: PlayState = {
     listSongPlay: [] as Song[],
     songActive: 0,
+    listSongRecommend: [] as Song[],
 };
 
 export const PlaySlice = createSlice({
@@ -47,6 +59,18 @@ export const PlaySlice = createSlice({
             action: PayloadAction<any>
         ) => {},
         [getPlaySong.rejected.toString()]: (
+            state,
+            action: PayloadAction<any>
+        ) => {},
+        //////////////////////////////////////////////////////////////////
+        [getRecommendSong.pending.toString()]: (state) => {},
+        [getRecommendSong.fulfilled.toString()]: (
+            state,
+            action: PayloadAction<any>
+        ) => {
+            state.listSongRecommend = action.payload;
+        },
+        [getRecommendSong.rejected.toString()]: (
             state,
             action: PayloadAction<any>
         ) => {},

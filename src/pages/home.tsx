@@ -14,9 +14,12 @@ import {
 } from "../store/slice/homeSlice";
 import { setSongList } from "../store/slice/playSlice";
 import { Skeleton } from "antd";
-import { Album, Category, Song } from "../interface";
+import { Album, Category, Song, User } from "../interface";
 import { getAllSinger } from "../store/slice/singerSlice";
 import { getCategoryHome } from "../store/slice/categorySlice";
+import ListSinger from "../components/ListSinger";
+import Singer from "./singer";
+import { notiWarning } from "../utils/notification";
 const slide = [
     {
         img: "https://photo-zmp3.zmdcdn.me/banner/5/5/8/a/558aa70110ea057e49322f8c052077db.jpg",
@@ -34,6 +37,8 @@ const Home = () => {
     const { listSongSlide, listSongHome, listAlbumHome } = useAppSelector(
         (state) => state.home
     );
+    const { user } = useAppSelector((state) => state.login);
+    const { allSinger } = useAppSelector((state) => state.singer);
     const albumShowHome = listAlbumHome
         ? (listAlbumHome.map((album, index) => {
               if (index < 13) return album;
@@ -43,6 +48,12 @@ const Home = () => {
         ? (listSongHome.map((song, index) => {
               if (index < 31) return song;
           }) as Song[])
+        : [];
+
+    const songSingerHome = allSinger
+        ? (allSinger.map((singer, index) => {
+              if (index < 7) return singer;
+          }) as User[])
         : [];
     const { categoryHome } = useAppSelector((state) => state.category);
     const dispatch = useAppDispatch();
@@ -123,9 +134,18 @@ const Home = () => {
                             {listSongSlide.map((song) => (
                                 <SwiperSlide key={song.id}>
                                     <div
-                                        onClick={() =>
-                                            dispatch(setSongList([song]))
-                                        }
+                                        onClick={() => {
+                                            if (
+                                                (user?.vip === 0 || !user) &&
+                                                song.free === 0
+                                            ) {
+                                                notiWarning(
+                                                    "Bạn cần là thành viên vip để nghe bài hát này."
+                                                );
+                                                return;
+                                            }
+                                            dispatch(setSongList([song]));
+                                        }}
                                         className="w-full pt-[100%] relative"
                                     >
                                         {/*  eslint-disable-next-line @next/next/no-img-element */}
@@ -167,6 +187,30 @@ const Home = () => {
                 <ListAlbum listAlbum={albumShowHome} />
             </div>
             <div className="w-full  pt-[20px] tablet:pt-[40px] relative">
+                <div
+                    onClick={() => {
+                        push("/singer");
+                    }}
+                    className="flex items-center text-sm tablet:text-base text-[#ffffff94] hover:text-[#891dee] cursor-pointer absolute right-0 top-[20px] tablet:top-[40px]"
+                >
+                    TẤT CẢ
+                    <BiChevronRight className="w-[25px] h-[25px] tablet:w-[30px] tablet:h-[30px] " />
+                </div>
+                <h1 className="text-[#fff]  text-lg tablet:text-xl font-bold z-10">
+                    Nghệ Sỹ
+                </h1>
+                <ListSinger listSinger={songSingerHome} />
+            </div>
+            <div className="w-full  pt-[20px] tablet:pt-[40px] relative">
+                <div
+                    onClick={() => {
+                        push("/bxh");
+                    }}
+                    className="flex items-center text-sm tablet:text-base text-[#ffffff94] hover:text-[#891dee] cursor-pointer absolute right-0 top-[20px] tablet:top-[40px]"
+                >
+                    BẢNG XẾP HẠNG
+                    <BiChevronRight className="w-[25px] h-[25px] tablet:w-[30px] tablet:h-[30px] " />
+                </div>
                 <h1 className="text-[#fff] text-lg tablet:text-xl font-bold">
                     Gợi ý cho bạn
                 </h1>

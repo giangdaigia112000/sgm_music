@@ -8,12 +8,14 @@ import {
 import Song from "../Song";
 import { Song as Songdetail } from "../../interface";
 import styles from "./ListSong.module.scss";
+import { useAppSelector } from "../../store/hooks";
 
 const mang = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18];
 interface Prop {
     listSong: Songdetail[];
 }
 const ListSong = ({ listSong }: Prop) => {
+    const { user } = useAppSelector((state) => state.login);
     return (
         <div className="w-full pt-[20px]">
             <Row justify="start" align="middle">

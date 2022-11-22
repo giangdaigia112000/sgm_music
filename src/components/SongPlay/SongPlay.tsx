@@ -17,16 +17,21 @@ import {
 import { BsSoundwave } from "react-icons/bs";
 import { Song } from "../../interface";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import { userReport } from "../../store/slice/loginSlice";
 import { updatePlaylist } from "../../store/slice/playlistSlice";
 import { setSongActive } from "../../store/slice/playSlice";
-import { setSingerId } from "../../store/slice/singerSlice";
+import { dowload, setSingerId } from "../../store/slice/singerSlice";
 import { notiWarning } from "../../utils/notification";
 import styles from "./SongPlay.module.scss";
 
 interface Prop {
     song: Song;
 }
-
+const report = [
+    "Vi phạm bản quyền",
+    "Ngôn ngữ gây đả kích",
+    "Nội dung phản cảm",
+];
 const SongPlay = ({ song }: Prop) => {
     const { listSongPlay, songActive } = useAppSelector((state) => state.play);
     const { user } = useAppSelector((state) => state.login);
@@ -77,21 +82,56 @@ const SongPlay = ({ song }: Prop) => {
             </div>
         );
     };
-    const PopoverPlayer = () => {
+    const PopoverPlayer = ({ pathname }: { pathname: string | undefined }) => {
         return (
             <div className="w-[160px] laptop:w-[200px] py-[7px]">
-                <div className="w-full text-xs laptop:text-sm h-[40px] flex gap-[5px] items-center text-[#fff] px-[10px] cursor-pointer hover:bg-[#493961]">
+                <div
+                    onClick={() => {
+                        dispatch(dowload(pathname as string));
+                    }}
+                    className="w-full text-xs laptop:text-sm h-[40px] flex gap-[5px] items-center text-[#fff] px-[10px] cursor-pointer hover:bg-[#493961]"
+                >
                     <BiDownload className="w-[20px] h-[20px] laptop:w-[28px] laptop:h-[28px] p-[3px]" />
                     <span className="flex items-center flex-1 justify-between">
                         Tải bài hát xuống
                     </span>
                 </div>
-                <div className="w-full text-xs laptop:text-sm h-[40px] flex gap-[5px] items-center text-[#fff] px-[10px] cursor-pointer hover:bg-[#493961]">
-                    <BiFlag className="w-[20px] h-[20px] laptop:w-[28px] laptop:h-[28px] p-[3px]" />
-                    <span className="flex items-center flex-1 justify-between">
-                        Báo cáo
-                    </span>
-                </div>
+                {user && (
+                    <Popover
+                        placement="right"
+                        trigger="click"
+                        _overlay={
+                            <div className="w-[160px] laptop:w-[200px] py-[10px] text-[#fff] pl-[10px]">
+                                {report.map((pl, idx) => (
+                                    <div
+                                        onClick={() => {
+                                            dispatch(
+                                                userReport({
+                                                    id: song.id,
+                                                    content: pl,
+                                                })
+                                            );
+                                        }}
+                                        key={idx}
+                                        className="w-full pl-[2px] text-xs laptop:text-sm h-[40px] flex gap-[5px] items-center text-[#fff]  cursor-pointer hover:bg-[#493961]"
+                                    >
+                                        <span className="flex items-center flex-1 justify-between">
+                                            {pl}
+                                        </span>
+                                    </div>
+                                ))}
+                            </div>
+                        }
+                    >
+                        <div className="w-full text-xs laptop:text-sm h-[40px] flex gap-[5px] items-center text-[#fff] px-[10px] cursor-pointer hover:bg-[#493961]">
+                            <BiFlag className="w-[20px] h-[20px] laptop:w-[28px] laptop:h-[28px] p-[3px]" />
+                            <span className="flex items-center flex-1 justify-between">
+                                Báo cáo
+                                <BiChevronRight className="w-[20px] h-[20px] laptop:w-[28px] laptop:h-[28px] p-[3px]" />
+                            </span>
+                        </div>
+                    </Popover>
+                )}
                 {user && (
                     <Popover
                         placement="right"
@@ -204,7 +244,7 @@ const SongPlay = ({ song }: Prop) => {
                 <Popover
                     placement="topRight"
                     trigger="click"
-                    _overlay={<PopoverPlayer />}
+                    _overlay={<PopoverPlayer pathname={song.file_path} />}
                 >
                     <BiDotsHorizontalRounded className="text-base bg-[#62616b] w-[28px] h-[28px] rounded-full p-[4px] cursor-pointer " />
                 </Popover>
@@ -219,19 +259,43 @@ const SongPlay = ({ song }: Prop) => {
                         borderRadius: "5px",
                     }}
                 >
-                    <BiDownload className="w-[25px] h-[25px] laptop:w-[28px] laptop:h-[28px] p-[3px] text-[#ffffff91] hover:text-[#ffffff] cursor-pointer" />
+                    <BiDownload
+                        onClick={() => {
+                            dispatch(dowload(song.file_path as string));
+                        }}
+                        className="w-[25px] h-[25px] laptop:w-[28px] laptop:h-[28px] p-[3px] text-[#ffffff91] hover:text-[#ffffff] cursor-pointer"
+                    />
                 </Tooltip>
-                <Tooltip
-                    placement="top"
-                    color="volcano"
-                    title={"Báo cáo"}
-                    mouseLeaveDelay={0}
-                    overlayInnerStyle={{
-                        borderRadius: "5px",
-                    }}
-                >
-                    <BiFlag className="w-[25px] h-[25px] laptop:w-[28px] laptop:h-[28px] p-[3px]  text-[#ffffff91] hover:text-[#ffffff] cursor-pointer" />
-                </Tooltip>
+                {user && (
+                    <Popover
+                        placement="right"
+                        trigger="click"
+                        _overlay={
+                            <div className="w-[160px] laptop:w-[200px] py-[10px] text-[#fff] pl-[10px]">
+                                {report.map((pl, idx) => (
+                                    <div
+                                        onClick={() => {
+                                            dispatch(
+                                                userReport({
+                                                    id: song.id,
+                                                    content: pl,
+                                                })
+                                            );
+                                        }}
+                                        key={idx}
+                                        className="w-full pl-[2px] text-xs laptop:text-sm h-[40px] flex gap-[5px] items-center text-[#fff]  cursor-pointer hover:bg-[#493961]"
+                                    >
+                                        <span className="flex items-center flex-1 justify-between">
+                                            {pl}
+                                        </span>
+                                    </div>
+                                ))}
+                            </div>
+                        }
+                    >
+                        <BiFlag className="w-[25px] h-[25px] laptop:w-[28px] laptop:h-[28px] p-[3px]  text-[#ffffff91] hover:text-[#ffffff] cursor-pointer" />
+                    </Popover>
+                )}
                 {user && (
                     <Popover
                         placement="topRight"

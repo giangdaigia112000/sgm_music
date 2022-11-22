@@ -4,33 +4,56 @@ import {
     BiPlay,
     BiCheckCircle,
     BiInfoCircle,
+    BiListPlus,
+    BiPlayCircle,
 } from "react-icons/bi";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, EffectCards } from "swiper";
 import ListSong from "../../components/ListSong";
 import Song from "../../components/Song";
 import ListAlbum from "../../components/ListAlbum";
-import { Button, Modal } from "antd";
+import { Button, Col, Modal, Popconfirm, Row, Tooltip } from "antd";
 import AddSong from "../../components/AddSong";
 import AddAlbum from "../../components/AddAlbum";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { useRouter } from "next/router";
 import moment from "moment";
-import { getDetailSinger } from "../../store/slice/singerSlice";
+import {
+    deleteAlbum,
+    deleteSong,
+    getDetailSinger,
+    setAlbumUpdate,
+    setSingerId,
+    setSongUpdate,
+} from "../../store/slice/singerSlice";
 import Loading from "../../components/Loading";
-import { setSongList } from "../../store/slice/playSlice";
-
+import { concatSongList, setSongList } from "../../store/slice/playSlice";
+import { notiWarning } from "../../utils/notification";
+import styles from "./Singerdetail.module.scss";
+import { setAlbumId } from "../../store/slice/albumSlice";
+import UpdateSong from "../../components/UpdateSong";
+import UpdateAlbum from "../../components/UpdateAlbum";
 const SingerDetail = () => {
     const { user } = useAppSelector((state) => state.login);
-    const { detailSinger, loadingApi, singerId, reload } = useAppSelector(
-        (state) => state.singer
-    );
-
-    const { query } = useRouter();
+    const {
+        detailSinger,
+        loadingApi,
+        singerId,
+        reload,
+        updateSong,
+        updateAlbum,
+    } = useAppSelector((state) => state.singer);
+    const { listSongPlay, songActive } = useAppSelector((state) => state.play);
+    const { query, push } = useRouter();
     const dispatch = useAppDispatch();
     const [value, setValue] = useState<number>(1);
     const [openModalAddSong, setOpenModalAddSong] = useState<boolean>(false);
+    const [openModalUpdateSong, setOpenModalUpdateSong] =
+        useState<boolean>(false);
+
     const [openModalAddAlbum, setOpenModalAddAlbum] = useState<boolean>(false);
+    const [openModalUpdateAlbum, setOpenModalUpdateAlbum] =
+        useState<boolean>(false);
 
     useEffect(() => {
         dispatch(getDetailSinger(singerId));
@@ -56,6 +79,26 @@ const SingerDetail = () => {
                 visible={openModalAddAlbum}
             >
                 <AddAlbum />
+            </Modal>
+
+            <Modal
+                title="Sửa bài hát "
+                centered
+                onCancel={() => setOpenModalUpdateSong(false)}
+                footer={[]}
+                visible={openModalUpdateSong}
+            >
+                <UpdateSong song={updateSong} />
+            </Modal>
+
+            <Modal
+                title="Sửa Album "
+                centered
+                onCancel={() => setOpenModalUpdateAlbum(false)}
+                footer={[]}
+                visible={openModalUpdateAlbum}
+            >
+                <UpdateAlbum album={updateAlbum} />
             </Modal>
             {user && user.id.toString() == query.id && (
                 <div className="w-full flex justify-center items-center">
@@ -111,8 +154,16 @@ const SingerDetail = () => {
                                             onClick={() => {
                                                 dispatch(
                                                     setSongList(
-                                                        detailSinger.detail
-                                                            .music
+                                                        detailSinger.detail.music.filter(
+                                                            (music: any) =>
+                                                                !(
+                                                                    (user?.vip ===
+                                                                        0 ||
+                                                                        !user) &&
+                                                                    music.free ===
+                                                                        0
+                                                                )
+                                                        )
                                                     )
                                                 );
                                             }}
@@ -152,7 +203,7 @@ const SingerDetail = () => {
                                     Danh sách bài hát
                                 </h1>
                                 <div className="w-full flex">
-                                    <div className="w-[320px] h-[320px] flex justify-center items-center  hidden tablet:block">
+                                    <div className="w-[320px] h-[320px] flex justify-center items-center hidden tablet:block">
                                         <div className="w-[300px] h-[300px]">
                                             <Swiper
                                                 effect={"cards"}
@@ -185,9 +236,64 @@ const SingerDetail = () => {
                                         </div>
                                     </div>
                                     <div className="w-[320px] tablet:h-[320px] flex-1 tablet:overflow-y-auto">
-                                        <ListSong
-                                            listSong={detailSinger.detail.music}
-                                        />
+                                        <div className="w-full pt-[20px]">
+                                            <Row justify="start" align="middle">
+                                                {detailSinger.detail.music.map(
+                                                    (song: any) => (
+                                                        <Col
+                                                            xs={24}
+                                                            md={12}
+                                                            xl={8}
+                                                            key={song.id}
+                                                        >
+                                                            <div className="w-full ">
+                                                                {user &&
+                                                                    user.id.toString() ==
+                                                                        query.id && (
+                                                                        <div className="flex gap-3 px-[10px]">
+                                                                            <span
+                                                                                onClick={() => {
+                                                                                    dispatch(
+                                                                                        setSongUpdate(
+                                                                                            song
+                                                                                        )
+                                                                                    );
+                                                                                    setOpenModalUpdateSong(
+                                                                                        true
+                                                                                    );
+                                                                                }}
+                                                                                className="hover:text-[#902fad] cursor-pointer"
+                                                                            >
+                                                                                Sửa
+                                                                            </span>
+                                                                            <Popconfirm
+                                                                                title="Bạn muốn xóa bài hát này"
+                                                                                onConfirm={() => {
+                                                                                    dispatch(
+                                                                                        deleteSong(
+                                                                                            song.id
+                                                                                        )
+                                                                                    );
+                                                                                }}
+                                                                                okText="Có"
+                                                                                cancelText="Không"
+                                                                            >
+                                                                                <span className="hover:text-[#902fad] cursor-pointer">
+                                                                                    Xóa
+                                                                                </span>
+                                                                            </Popconfirm>
+                                                                        </div>
+                                                                    )}
+
+                                                                <Song
+                                                                    song={song}
+                                                                />
+                                                            </div>
+                                                        </Col>
+                                                    )
+                                                )}
+                                            </Row>
+                                        </div>
                                     </div>
                                 </div>
                             </>
@@ -213,9 +319,251 @@ const SingerDetail = () => {
                                     <h1 className="text-[#fff] text-lg tablet:text-xl font-bold">
                                         Album
                                     </h1>
-                                    <ListAlbum
-                                        listAlbum={detailSinger.albums}
-                                    />
+                                    <div className="w-full pt-[20px]">
+                                        <Row justify="start" align="middle">
+                                            {detailSinger.albums &&
+                                                detailSinger.albums.length !==
+                                                    0 && (
+                                                    <>
+                                                        {detailSinger.albums.map(
+                                                            (album: any) => (
+                                                                <Col
+                                                                    xs={8}
+                                                                    md={6}
+                                                                    xl={4}
+                                                                    key={
+                                                                        album.id
+                                                                    }
+                                                                >
+                                                                    <div className="w-full ">
+                                                                        {user &&
+                                                                            user.id.toString() ==
+                                                                                query.id && (
+                                                                                <div className="flex gap-3 px-[10px]">
+                                                                                    <span
+                                                                                        onClick={() => {
+                                                                                            dispatch(
+                                                                                                setAlbumUpdate(
+                                                                                                    album
+                                                                                                )
+                                                                                            );
+                                                                                            setOpenModalUpdateAlbum(
+                                                                                                true
+                                                                                            );
+                                                                                        }}
+                                                                                        className="hover:text-[#902fad] cursor-pointer"
+                                                                                    >
+                                                                                        Sửa
+                                                                                    </span>
+                                                                                    <Popconfirm
+                                                                                        title="Bạn muốn xóa album này"
+                                                                                        onConfirm={() => {
+                                                                                            dispatch(
+                                                                                                deleteAlbum(
+                                                                                                    album.id
+                                                                                                )
+                                                                                            );
+                                                                                        }}
+                                                                                        okText="Có"
+                                                                                        cancelText="Không"
+                                                                                    >
+                                                                                        <span className="hover:text-[#902fad] cursor-pointer">
+                                                                                            Xóa
+                                                                                        </span>
+                                                                                    </Popconfirm>
+                                                                                </div>
+                                                                            )}
+                                                                    </div>
+                                                                    <div className="w-full p-[4px] tablet:p-[8px] laptop:p-[10px]">
+                                                                        <div className="relative w-full pt-[100%] ">
+                                                                            <div
+                                                                                className={`absolute top-0 left-0 right-0 bottom-0 overflow-hidden rounded-lg  ${styles.cateHover}`}
+                                                                            >
+                                                                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                                                                <img
+                                                                                    className="w-full h-full object-cover "
+                                                                                    src={`${process.env.HOST_NAME_STREAM}/image/${album.thumbnail}`}
+                                                                                    alt="Album"
+                                                                                />
+                                                                                <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center bg-[#00000086] gap-[10px] ">
+                                                                                    <Tooltip
+                                                                                        placement="top"
+                                                                                        color="volcano"
+                                                                                        title={
+                                                                                            "Nghe List"
+                                                                                        }
+                                                                                        mouseLeaveDelay={
+                                                                                            0
+                                                                                        }
+                                                                                        overlayInnerStyle={{
+                                                                                            borderRadius:
+                                                                                                "5px",
+                                                                                        }}
+                                                                                    >
+                                                                                        <BiPlayCircle
+                                                                                            onClick={() => {
+                                                                                                if (
+                                                                                                    album
+                                                                                                        .music
+                                                                                                        .length ===
+                                                                                                    0
+                                                                                                ) {
+                                                                                                    notiWarning(
+                                                                                                        "Album rỗng."
+                                                                                                    );
+                                                                                                    return;
+                                                                                                }
+                                                                                                push(
+                                                                                                    "/play"
+                                                                                                );
+                                                                                                dispatch(
+                                                                                                    setSongList(
+                                                                                                        album.music.filter(
+                                                                                                            (
+                                                                                                                music: any
+                                                                                                            ) =>
+                                                                                                                !(
+                                                                                                                    (user?.vip ===
+                                                                                                                        0 ||
+                                                                                                                        !user) &&
+                                                                                                                    music.free ===
+                                                                                                                        0
+                                                                                                                )
+                                                                                                        )
+                                                                                                    )
+                                                                                                );
+                                                                                            }}
+                                                                                            className="w-[25px] h-[25px] tablet:w-[40px] tablet:h-[40px]   text-[#ffffff80] hover:text-[#ffffff] cursor-pointer"
+                                                                                        />
+                                                                                    </Tooltip>
+                                                                                    <Tooltip
+                                                                                        placement="top"
+                                                                                        color="volcano"
+                                                                                        title={
+                                                                                            "Thêm vào danh sách phát"
+                                                                                        }
+                                                                                        mouseLeaveDelay={
+                                                                                            0
+                                                                                        }
+                                                                                        overlayInnerStyle={{
+                                                                                            borderRadius:
+                                                                                                "5px",
+                                                                                        }}
+                                                                                    >
+                                                                                        <BiListPlus
+                                                                                            onClick={() => {
+                                                                                                const listId =
+                                                                                                    listSongPlay.map(
+                                                                                                        (
+                                                                                                            song
+                                                                                                        ) =>
+                                                                                                            song.id
+                                                                                                    );
+                                                                                                if (
+                                                                                                    album
+                                                                                                        .music
+                                                                                                        .length ===
+                                                                                                    0
+                                                                                                ) {
+                                                                                                    notiWarning(
+                                                                                                        "Album rỗng."
+                                                                                                    );
+                                                                                                    return;
+                                                                                                }
+                                                                                                const listMusicCheck =
+                                                                                                    album.music
+                                                                                                        .filter(
+                                                                                                            (
+                                                                                                                music: any
+                                                                                                            ) =>
+                                                                                                                !(
+                                                                                                                    (user?.vip ===
+                                                                                                                        0 ||
+                                                                                                                        !user) &&
+                                                                                                                    music.free ===
+                                                                                                                        0
+                                                                                                                )
+                                                                                                        )
+                                                                                                        .filter(
+                                                                                                            (
+                                                                                                                music: any
+                                                                                                            ) =>
+                                                                                                                !listId.includes(
+                                                                                                                    music.id
+                                                                                                                )
+                                                                                                        );
+                                                                                                if (
+                                                                                                    listMusicCheck.length ===
+                                                                                                    0
+                                                                                                ) {
+                                                                                                    notiWarning(
+                                                                                                        "Tất cả bài hát đang trong danh sách phát"
+                                                                                                    );
+                                                                                                    return;
+                                                                                                }
+                                                                                                push(
+                                                                                                    "/play"
+                                                                                                );
+                                                                                                dispatch(
+                                                                                                    concatSongList(
+                                                                                                        listMusicCheck
+                                                                                                    )
+                                                                                                );
+                                                                                            }}
+                                                                                            className="w-[25px] h-[25px] tablet:w-[40px] tablet:h-[40px]   text-[#ffffff80] hover:text-[#ffffff] cursor-pointer"
+                                                                                        />
+                                                                                    </Tooltip>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                        <h1
+                                                                            onClick={() => {
+                                                                                dispatch(
+                                                                                    setAlbumId(
+                                                                                        album.id
+                                                                                    )
+                                                                                );
+                                                                                push(
+                                                                                    `/albumdetail/${album.id}`
+                                                                                );
+                                                                            }}
+                                                                            className="text-[#fff] m-0 text-xs tablet:text-base font-bold hiddentitle pt-[8px] hover:text-[#891dee] cursor-pointer"
+                                                                        >
+                                                                            {
+                                                                                album.name
+                                                                            }
+                                                                        </h1>
+                                                                        {album?.singer && (
+                                                                            <h1
+                                                                                onClick={() => {
+                                                                                    dispatch(
+                                                                                        setSingerId(
+                                                                                            album
+                                                                                                .singer
+                                                                                                .id
+                                                                                        )
+                                                                                    );
+                                                                                    push(
+                                                                                        `/singerdetail/${album.singer.id}`
+                                                                                    );
+                                                                                }}
+                                                                                className="text-[#ffffff80] text-xs tablet:text-sm  hiddentitle pt-[3px] hover:text-[#891dee] cursor-pointer"
+                                                                            >
+                                                                                {
+                                                                                    album
+                                                                                        .singer
+                                                                                        .name
+                                                                                }
+                                                                            </h1>
+                                                                        )}
+                                                                    </div>
+                                                                </Col>
+                                                            )
+                                                        )}
+                                                    </>
+                                                )}
+                                        </Row>
+                                    </div>
                                 </>
                             )}
                         </div>

@@ -18,11 +18,17 @@ import { notiError, notiWarning } from "../../utils/notification";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { getPlaySong, setSongActive } from "../../store/slice/playSlice";
 import { updatePlaylist } from "../../store/slice/playlistSlice";
-import { setSingerId } from "../../store/slice/singerSlice";
-
+import { dowload, setSingerId } from "../../store/slice/singerSlice";
+import { userReport } from "../../store/slice/loginSlice";
+const report = [
+    "Vi phạm bản quyền",
+    "Ngôn ngữ gây đả kích",
+    "Nội dung phản cảm",
+];
 const PlayAudio = () => {
     const { listSongPlay, songActive } = useAppSelector((state) => state.play);
     const { allPlaylist } = useAppSelector((state) => state.playlist);
+    const { user } = useAppSelector((state) => state.login);
 
     const dispatch = useAppDispatch();
 
@@ -121,18 +127,67 @@ const PlayAudio = () => {
     const PopoverPlayer = () => {
         return (
             <div className="w-[160px] laptop:w-[200px] py-[7px]">
-                <div className="w-full text-xs laptop:text-sm h-[40px] flex gap-[5px] items-center text-[#fff] px-[10px] cursor-pointer hover:bg-[#493961]">
+                <div
+                    onClick={() => {
+                        if (
+                            user?.vip === 0 &&
+                            listSongPlay[songActive].free === 0
+                        ) {
+                            notiWarning(
+                                "Bạn cần là thành viên vip để tải bài hát này."
+                            );
+                            return;
+                        }
+                        dispatch(
+                            dowload(
+                                listSongPlay[songActive].file_path as string
+                            )
+                        );
+                    }}
+                    className="w-full text-xs laptop:text-sm h-[40px] flex gap-[5px] items-center text-[#fff] px-[10px] cursor-pointer hover:bg-[#493961]"
+                >
                     <BiDownload className="w-[20px] h-[20px] laptop:w-[28px] laptop:h-[28px] p-[3px]" />
                     <span className="flex items-center flex-1 justify-between">
                         Tải bài hát xuống
                     </span>
                 </div>
-                <div className="w-full text-xs laptop:text-sm h-[40px] flex gap-[5px] items-center text-[#fff] px-[10px] cursor-pointer hover:bg-[#493961]">
-                    <BiFlag className="w-[20px] h-[20px] laptop:w-[28px] laptop:h-[28px] p-[3px]" />
-                    <span className="flex items-center flex-1 justify-between">
-                        Báo cáo
-                    </span>
-                </div>
+                {user && (
+                    <Popover
+                        placement="right"
+                        trigger="click"
+                        _overlay={
+                            <div className="w-[160px] laptop:w-[200px] py-[10px] text-[#fff] pl-[10px]">
+                                {report.map((pl, idx) => (
+                                    <div
+                                        onClick={() => {
+                                            dispatch(
+                                                userReport({
+                                                    id: listSongPlay[songActive]
+                                                        .id,
+                                                    content: pl,
+                                                })
+                                            );
+                                        }}
+                                        key={idx}
+                                        className="w-full pl-[2px] text-xs laptop:text-sm h-[40px] flex gap-[5px] items-center text-[#fff]  cursor-pointer hover:bg-[#493961]"
+                                    >
+                                        <span className="flex items-center flex-1 justify-between">
+                                            {pl}
+                                        </span>
+                                    </div>
+                                ))}
+                            </div>
+                        }
+                    >
+                        <div className="w-full text-xs laptop:text-sm h-[40px] flex gap-[5px] items-center text-[#fff] px-[10px] cursor-pointer hover:bg-[#493961]">
+                            <BiFlag className="w-[20px] h-[20px] laptop:w-[28px] laptop:h-[28px] p-[3px]" />
+                            <span className="flex items-center flex-1 justify-between">
+                                Báo cáo
+                                <BiChevronRight className="w-[20px] h-[20px] laptop:w-[28px] laptop:h-[28px] p-[3px]" />
+                            </span>
+                        </div>
+                    </Popover>
+                )}
                 <Popover
                     placement="right"
                     trigger="click"
@@ -232,8 +287,58 @@ const PlayAudio = () => {
                             </Popover>
                         </div>
                         <div className="h-full flex-1  justify-end items-center gap-[5px] hidden tablet:flex laptop:hidden">
-                            <BiDownload className="w-[25px] h-[25px] laptop:w-[28px] laptop:h-[28px] p-[3px] text-[#ffffff80] hover:text-[#ffffff] cursor-pointer" />
-                            <BiFlag className="w-[25px] h-[25px] laptop:w-[28px] laptop:h-[28px] p-[3px]  text-[#ffffff80] hover:text-[#ffffff] cursor-pointer" />
+                            <BiDownload
+                                onClick={() => {
+                                    if (
+                                        user?.vip === 0 &&
+                                        listSongPlay[songActive].free === 0
+                                    ) {
+                                        notiWarning(
+                                            "Bạn cần là thành viên vip để tải bài hát này."
+                                        );
+                                        return;
+                                    }
+                                    dispatch(
+                                        dowload(
+                                            listSongPlay[songActive]
+                                                .file_path as string
+                                        )
+                                    );
+                                }}
+                                className="w-[25px] h-[25px] laptop:w-[28px] laptop:h-[28px] p-[3px] text-[#ffffff80] hover:text-[#ffffff] cursor-pointer"
+                            />
+                            {user && (
+                                <Popover
+                                    placement="right"
+                                    trigger="click"
+                                    _overlay={
+                                        <div className="w-[160px] laptop:w-[200px] py-[10px] text-[#fff] pl-[10px]">
+                                            {report.map((pl, idx) => (
+                                                <div
+                                                    onClick={() => {
+                                                        dispatch(
+                                                            userReport({
+                                                                id: listSongPlay[
+                                                                    songActive
+                                                                ].id,
+                                                                content: pl,
+                                                            })
+                                                        );
+                                                    }}
+                                                    key={idx}
+                                                    className="w-full pl-[2px] text-xs laptop:text-sm h-[40px] flex gap-[5px] items-center text-[#fff]  cursor-pointer hover:bg-[#493961]"
+                                                >
+                                                    <span className="flex items-center flex-1 justify-between">
+                                                        {pl}
+                                                    </span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    }
+                                >
+                                    <BiFlag className="w-[25px] h-[25px] laptop:w-[28px] laptop:h-[28px] p-[3px]  text-[#ffffff91] hover:text-[#ffffff] cursor-pointer" />
+                                </Popover>
+                            )}
                             <Popover
                                 placement="topRight"
                                 trigger="click"
@@ -281,19 +386,59 @@ const PlayAudio = () => {
                                 borderRadius: "5px",
                             }}
                         >
-                            <BiDownload className="w-[25px] h-[25px] laptop:w-[28px] laptop:h-[28px] p-[3px] text-[#ffffff80] hover:text-[#ffffff] cursor-pointer" />
+                            <BiDownload
+                                onClick={() => {
+                                    if (
+                                        user?.vip === 0 &&
+                                        listSongPlay[songActive].free === 0
+                                    ) {
+                                        notiWarning(
+                                            "Bạn cần là thành viên vip để tải bài hát này."
+                                        );
+                                        return;
+                                    }
+                                    dispatch(
+                                        dowload(
+                                            listSongPlay[songActive]
+                                                .file_path as string
+                                        )
+                                    );
+                                }}
+                                className="w-[25px] h-[25px] laptop:w-[28px] laptop:h-[28px] p-[3px] text-[#ffffff80] hover:text-[#ffffff] cursor-pointer"
+                            />
                         </Tooltip>
-                        <Tooltip
-                            placement="top"
-                            color="volcano"
-                            title={"Báo cáo"}
-                            mouseLeaveDelay={0}
-                            overlayInnerStyle={{
-                                borderRadius: "5px",
-                            }}
-                        >
-                            <BiFlag className="w-[25px] h-[25px] laptop:w-[28px] laptop:h-[28px] p-[3px]  text-[#ffffff80] hover:text-[#ffffff] cursor-pointer" />
-                        </Tooltip>
+                        {user && (
+                            <Popover
+                                placement="right"
+                                trigger="click"
+                                _overlay={
+                                    <div className="w-[160px] laptop:w-[200px] py-[10px] text-[#fff] pl-[10px]">
+                                        {report.map((pl, idx) => (
+                                            <div
+                                                onClick={() => {
+                                                    dispatch(
+                                                        userReport({
+                                                            id: listSongPlay[
+                                                                songActive
+                                                            ].id,
+                                                            content: pl,
+                                                        })
+                                                    );
+                                                }}
+                                                key={idx}
+                                                className="w-full pl-[2px] text-xs laptop:text-sm h-[40px] flex gap-[5px] items-center text-[#fff]  cursor-pointer hover:bg-[#493961]"
+                                            >
+                                                <span className="flex items-center flex-1 justify-between">
+                                                    {pl}
+                                                </span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                }
+                            >
+                                <BiFlag className="w-[25px] h-[25px] laptop:w-[28px] laptop:h-[28px] p-[3px]  text-[#ffffff91] hover:text-[#ffffff] cursor-pointer" />
+                            </Popover>
+                        )}
                         <Popover
                             placement="topRight"
                             trigger="click"

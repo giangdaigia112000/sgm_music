@@ -3,6 +3,7 @@
 @tailwind utilities;
 @import "swiper/css";
 @import "swiper/css/navigation";
+@import "react-credit-cards/es/styles-compiled.css";
 html,
 body {
     padding: 0;
@@ -87,6 +88,9 @@ a {
 /* custom ant popover */
 .ant-popover-arrow-content {
     --antd-arrow-background-color: #34224f !important;
+}
+.ant-popover-message-title {
+    color: #ffffff;
 }
 .ant-popover-inner {
     background-color: #34224f !important;

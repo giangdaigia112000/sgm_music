@@ -10,18 +10,21 @@ export interface User {
     permissions: string[];
     created_at: string;
     updated_at: string;
+    vip: number;
+    vip_expried: string;
 }
 export interface Song {
     id: number;
     title?: string;
     user_upload?: number;
     album_id?: number;
-    time?: number;
+    time?: string;
     description?: string;
     lyrics?: string;
     thumbnail?: string;
     file_path?: string;
-    views?: 0;
+    views?: number;
+    free: number;
     created_at?: string;
     updated_at?: string;
     deleted_at?: string;

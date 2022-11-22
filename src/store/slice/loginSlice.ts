@@ -31,6 +31,35 @@ export const userCheckMe = createAsyncThunk("userCheckMe", async () => {
     return res.data;
 });
 
+export const userPayVip = createAsyncThunk(
+    "userPayVip",
+    async (data: any, thunkAPI) => {
+        const { cvc, date, name, number } = data;
+        const time = date.split("/");
+
+        const res = await axiosClient.post("/api/payment", {
+            card_number: number,
+            cvc: cvc,
+            month: time[0] ? time[0] : 12,
+            year: time[1] ? time[1] : 25,
+        });
+        thunkAPI.dispatch(userCheckMe());
+        return res.data;
+    }
+);
+
+export const userReport = createAsyncThunk(
+    "userReport",
+    async (data: any, thunkAPI) => {
+        const { id, content } = data;
+        const res = await axiosClient.post("/api/report", {
+            music_id: id,
+            message: content,
+        });
+        return res.data;
+    }
+);
+
 export interface LoginState {
     loading: boolean;
     navActive: boolean;
@@ -120,6 +149,41 @@ export const LoginSlice = createSlice({
             action: PayloadAction<any>
         ) => {
             state.loading = false;
+        },
+        //////////////////////////////////////////////////////////////////
+        [userPayVip.pending.toString()]: (state) => {
+            state.loading = true;
+        },
+        [userPayVip.fulfilled.toString()]: (
+            state,
+            action: PayloadAction<any>
+        ) => {
+            state.loading = false;
+            if (action.payload === 1) {
+                notiSuccess("Thanh toán gói vip thành công.");
+            } else {
+                notiError("Thanh toán thất bại.");
+            }
+        },
+        [userPayVip.rejected.toString()]: (
+            state,
+            action: PayloadAction<any>
+        ) => {
+            state.loading = false;
+        },
+        //////////////////////////////////////////////////////////////////
+        [userReport.pending.toString()]: (state) => {},
+        [userReport.fulfilled.toString()]: (
+            state,
+            action: PayloadAction<any>
+        ) => {
+            notiSuccess("Gửi báo cáo thành công.");
+        },
+        [userReport.rejected.toString()]: (
+            state,
+            action: PayloadAction<any>
+        ) => {
+            notiError("Gửi báo cáo thất bại.");
         },
     },
 });

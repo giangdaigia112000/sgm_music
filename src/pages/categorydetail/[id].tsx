@@ -16,6 +16,8 @@ const CategoryDetail = () => {
     const { detailCategory, loadingApi, categoryId } = useAppSelector(
         (state) => state.category
     );
+
+    const { user } = useAppSelector((state) => state.login);
     const dispatch = useAppDispatch();
     const { push } = useRouter();
 
@@ -63,7 +65,15 @@ const CategoryDetail = () => {
                                             push("/play");
                                             dispatch(
                                                 setSongList(
-                                                    detailCategory.music
+                                                    detailCategory.music.filter(
+                                                        (music) =>
+                                                            !(
+                                                                (user?.vip ===
+                                                                    0 ||
+                                                                    !user) &&
+                                                                music.free === 0
+                                                            )
+                                                    )
                                                 )
                                             );
                                         }}

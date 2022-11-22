@@ -21,6 +21,7 @@ import {
 import { userSearch } from "../../store/slice/homeSlice";
 import { setSongList } from "../../store/slice/playSlice";
 import { setSingerId } from "../../store/slice/singerSlice";
+import { RiVipCrown2Fill } from "react-icons/ri";
 const cx = classNames.bind(styles);
 const { Search } = Input;
 function Header(): JSX.Element {
@@ -147,7 +148,7 @@ function Header(): JSX.Element {
                         />
                         <div className={cx("search-result")}>
                             <h1 className="font-semibold py-[5px] text-sm tablet:text-base">
-                                Gợi ý kết quả{" "}
+                                Gợi ý kết quả
                                 {loadingSearch && <LoadingOutlined />}
                             </h1>
                             {listSingerSearch.length === 0 &&
@@ -273,6 +274,9 @@ function Header(): JSX.Element {
                                         <span className="font-bold pl-[10px] hidden tablet:block">
                                             {user.name}
                                         </span>
+                                        {user.vip === 1 && (
+                                            <RiVipCrown2Fill className="w-[22px] h-[22px] text-[#e1fa00]" />
+                                        )}
                                     </div>
                                 </Popover>
                             )}
