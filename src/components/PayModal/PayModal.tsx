@@ -23,7 +23,9 @@ const PayModal = () => {
     return (
         <div className=" p-[20px] w-full  tablet:max-w-[800px] rounded-xl">
             <div className="w-full">
-                <h1>Âm nhạc không giới hạn chỉ với 5$/tháng </h1>
+                <h1 className="text-center text-[#fff]">
+                    Âm nhạc không giới hạn chỉ với 5$/tháng{" "}
+                </h1>
             </div>
             <Cards
                 cvc={cvc}

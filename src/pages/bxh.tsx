@@ -41,7 +41,7 @@ const BXH = () => {
                                                     : "#e35050"
                                             }`,
                                         }}
-                                        className=" font-bold text-[#fff0] "
+                                        className=" font-bold text-[#fff0] w-[50px] "
                                     >
                                         {index + 1}
                                     </span>

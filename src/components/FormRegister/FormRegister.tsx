@@ -26,7 +26,6 @@ const FormRegister = () => {
                 password,
                 role,
                 date_of_birth: date._d,
-                _method: "post",
             })
         );
     };

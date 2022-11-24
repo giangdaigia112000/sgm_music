@@ -39,22 +39,10 @@ const Home = () => {
     );
     const { user } = useAppSelector((state) => state.login);
     const { allSinger } = useAppSelector((state) => state.singer);
-    const albumShowHome = listAlbumHome
-        ? (listAlbumHome.map((album, index) => {
-              if (index < 13) return album;
-          }) as Album[])
-        : [];
-    const songShowHome = listSongHome
-        ? (listSongHome.map((song, index) => {
-              if (index < 31) return song;
-          }) as Song[])
-        : [];
+    const albumShowHome = listAlbumHome ? listAlbumHome.slice(0, 6) : [];
+    const songShowHome = listSongHome ? listSongHome : [];
 
-    const songSingerHome = allSinger
-        ? (allSinger.map((singer, index) => {
-              if (index < 7) return singer;
-          }) as User[])
-        : [];
+    const songSingerHome = allSinger ? allSinger.slice(0, 8) : [];
     const { categoryHome } = useAppSelector((state) => state.category);
     const dispatch = useAppDispatch();
 
